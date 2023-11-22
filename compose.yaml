@@ -1,0 +1,69 @@
+# Referenced from: https://learn.microsoft.com/en-us/dotnet/architecture/microservices/multi-container-microservice-net-applications/multi-container-applications-docker-compose
+# Composing the containers/nodes for the distributed system
+
+services:
+# Master node/server
+  master:
+    build:
+      context: .
+      dockerfile: Dockerfile-master
+    ports:
+      - "5000:5000"
+    command: ["python", "master.py"]
+    networks:
+      - the-network
+
+  # Worker node 1
+  node1:
+    build:
+      context: .
+      dockerfile: Dockerfile-node1
+    ports:
+      - "5001:5000"
+    command: ["python", "node1.py"]
+    networks:
+      - the-network
+
+  # # Worker node 2
+  # node2:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile-node2
+  #   ports:
+  #     - "5002:5000"
+  #   command: ["python", "node2.py"]
+  #   networks:
+  #     - the-network
+
+  # # Worker node 3
+  # node3:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile-node3
+  #   ports:
+  #     - "5003:5000"
+  #   command: ["python", "node3.py"]
+  #   networks:
+  #     - the-network
+
+  # # Worker node 4
+  # node4:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile-node4
+  #   ports:
+  #     - "5004:5000"
+  #   command: ["python", "node4.py"]
+  #   networks:
+  #     - the-network
+
+
+
+# Sourced from: https://stackoverflow.com/questions/27937185/assign-static-ip-to-docker-container
+# Assigning static IP addresses to the nodes
+networks:
+  the-network:
+    # ipam:
+    #   config:
+    #     - subnet: 172.28.0.0/16 #static ip address
+         
