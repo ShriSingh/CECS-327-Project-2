@@ -4,8 +4,9 @@ from sklearn.model_selection import train_test_split
 
 def data_pre_processing(file):
     """
-    Removing the null rows from the data in the csv file
-    and split the data into training and testing datasets
+    Removing the null rows from the data in the csv file,
+    splitting the data into training and testing datasets,
+    and storing the training and testing datasets into csv files.
     """
     # Reading the csv file
     data_read = pd.read_csv(file)
@@ -17,16 +18,38 @@ def data_pre_processing(file):
     # null_count = data_read.isnull().sum()
     # print(null_count)
     
-    # Assigning the rows and columsn for the data with missing values
-    dropped_rows = modified_data[['longitude', 'latitude', 'housing_median_age' , 'total_rooms', 'total_bedrooms', 'population', 'households', 'median_income', 'median_house_value', 'ocean_proximity']]
-    dropped_columns = modified_data['total_bedrooms'] # Since this is the only column with missing values
+    # Assigning the rows(x-values) and columns(y-values) for the data without missing values
+    independent_var = modified_data[['longitude', 'latitude', 'housing_median_age' , 'total_rooms', 'total_bedrooms',
+                                     'population', 'households', 'median_income', 'ocean_proximity']]
+    dependent_var = modified_data['median_house_value']
 
     # Splitting the data into training and testing datasets
-    x_train, x_test, y_train, y_test = train_test_split(dropped_rows, dropped_columns, test_size=0.1)
+    x_train, x_test, y_train, y_test = train_test_split(independent_var, dependent_var, test_size=0.1)
 
+    # Storing the training and testing datasets into csv files
+    x_train.to_csv('x_train.csv')
+    x_test.to_csv('x_test.csv')
+    y_train.to_csv('y_train.csv')
+    y_test.to_csv('y_test.csv')
+    
+    # Checking any null values present in the training & testing datasets
+    '''
+    x_train_read = pd.read_csv('x_train.csv')
+    null_count_1 = x_train_read.isnull().sum()
+    print(null_count_1)
+    
+    x_test_read = pd.read_csv('x_test.csv')
+    null_count_2 = x_test_read.isnull().sum()
+    print(null_count_2)
 
-    # Writing the pre-processed data to a new csv file
-    # data_read.to_csv('housing_pre_processed.csv', index=False)
+    y_train_read = pd.read_csv('y_train.csv')
+    null_count_3 = y_train_read.isnull().sum()
+    print(null_count_3)
+
+    y_test_read = pd.read_csv('y_test.csv')
+    null_count_4 = y_test_read.isnull().sum()
+    print(null_count_4)
+    '''
 
 
 # Writing the main function
