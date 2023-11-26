@@ -1,4 +1,6 @@
 # Importing necessary libraries
+import socket
+import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -24,14 +26,14 @@ def data_pre_processing(file):
     dependent_var = modified_data['median_house_value']
 
     # Splitting the data into training and testing datasets
-    x_train, x_test, y_train, y_test = train_test_split(independent_var, dependent_var, test_size=0.1)
+    x_train, x_test, y_train, y_test = train_test_split(independent_var, dependent_var, test_size=0.25, random_state=42)
 
     # Storing the training and testing datasets into csv files
     x_train.to_csv('x_train.csv')
     x_test.to_csv('x_test.csv')
     y_train.to_csv('y_train.csv')
     y_test.to_csv('y_test.csv')
-    
+
     # Checking any null values present in the training & testing datasets
     '''
     x_train_read = pd.read_csv('x_train.csv')
@@ -50,7 +52,6 @@ def data_pre_processing(file):
     null_count_4 = y_test_read.isnull().sum()
     print(null_count_4)
     '''
-
 
 # Writing the main function
 if __name__ == '__main__':
