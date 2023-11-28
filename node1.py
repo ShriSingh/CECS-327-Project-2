@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 
+regressor = LinearRegression()
+
 def listen():
     #listen and receive file from master https://www.geeksforgeeks.org/file-transfer-using-tcp-socket-in-python/
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
@@ -32,19 +34,30 @@ def listen():
 
 #training the linear regression model
 def training():
-    # Import data from Social_Network_Ads.csv file into a DataFrame
-    df = pd.read_csv("Social_Network_Ads.csv")
+    # Import data from train_data.csv file into a DataFrame
+    df = pd.read_csv("train_data.csv")
     X_train = df.iloc[:,:-1].values 
     y_train = df.iloc[:,-1].values
 
     # Build a linear regression model with X_train, y_train
-    regressor = LinearRegression()
     regressor.fit(X_train ,y_train) 
 
+def testing():
+    # Import data from train_data.csv file into a DataFrame
+    df = pd.read_csv("test_data.csv")
+    X_test = df.iloc[:,:].values 
+
+    # Predict the test set results y_pred (y_hat) from X_test
+    y_pred = regressor.predict(X_test)
+    
+    # send y_pred to master
 
 if __name__ == '__main__':
     # listen()
     training()
+    # let master know it has finished training
+    # listen()
+    testing()
 
 
     
