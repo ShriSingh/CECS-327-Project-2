@@ -1,10 +1,12 @@
-# Importing necessary libraries
-import socket as soc
+# Libraries for data pre-processing
 import numpy as np
 import pandas as pd
+import os
+from sklearn.model_selection import train_test_split
+# Libraries for doing multicasting
+import socket as soc
 import struct
 import sys
-from sklearn.model_selection import train_test_split
 
 def data_pre_processing(file):
     """
@@ -30,39 +32,19 @@ def data_pre_processing(file):
     # Splitting the data into training and testing datasets
     x_train, x_test, y_train, y_test = train_test_split(independent_var, dependent_var, test_size=0.25, random_state=42)
 
-    # Storing the training and testing datasets into csv files
-    x_train.to_csv('x_train.csv')
-    x_test.to_csv('x_test.csv')
-    y_train.to_csv('y_train.csv')
-    y_test.to_csv('y_test.csv')
-
-    # Returning the training and testing datasets
-    return x_train, x_test, y_train, y_test
-
-def csv_concat(train_1, test_1, train_2, test_2):
-    """
-    Combining the 'train' files(x_train.csv and y_train.csv)
-    and the 'test' files(x_test.csv and y_test.csv)
-    """
-    # Reading the csv files
-    x_train = pd.read_csv(train_1)
-    y_train = pd.read_csv(train_2)
-    x_test = pd.read_csv(test_1)
-    y_test = pd.read_csv(test_2)
-
-    # Merging the 'train' files
+    # Merging the x_train and y_train datasets into one 'train' file
     train_data = pd.concat([x_train, y_train], axis=1)
     train_data.to_csv('train.csv')
 
-    # Merging the 'test' files
+    # Merging the x_test and y_test datasets into one 'test' file
     test_data = pd.concat([x_test, y_test], axis=1)
     test_data.to_csv('test.csv')
+
 
 # Writing the main function
 if __name__ == '__main__':
     # Storing the input file name
     INPUT_FILE = 'housing.csv'
 
-    # Calling the function
-    # data_pre_processing(INPUT_FILE)
-    csv_concat('x_train.csv', 'x_test.csv', 'y_train.csv', 'y_test.csv')
+    # Calling the functions
+    data_pre_processing(INPUT_FILE)
