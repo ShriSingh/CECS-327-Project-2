@@ -64,8 +64,11 @@ def listen(n): #n == 1: for training 2: for testing
         # send the predicted result to master
         multicast_node_socket.sendto(str(y_pred).encode(),address)
 
-#training the linear regression model
 def training(train_data):
+    """
+    Training the linear regression model
+    :param train_data: the training data
+    """
     # Import data from train_data.csv file into a DataFrame
     df = pd.read_csv(StringIO(train_data)) #can change to io.StringIO(train_data), sep="," if this doesnt work
     X_train = df.iloc[:,:-1].values 
