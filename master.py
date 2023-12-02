@@ -1,7 +1,9 @@
 # Importing necessary libraries
-import socket
+import socket as soc
 import numpy as np
 import pandas as pd
+import struct
+import sys
 from sklearn.model_selection import train_test_split
 
 def data_pre_processing(file):
@@ -34,24 +36,27 @@ def data_pre_processing(file):
     y_train.to_csv('y_train.csv')
     y_test.to_csv('y_test.csv')
 
-    # Checking any null values present in the training & testing datasets
-    '''
-    x_train_read = pd.read_csv('x_train.csv')
-    null_count_1 = x_train_read.isnull().sum()
-    print(null_count_1)
-    
-    x_test_read = pd.read_csv('x_test.csv')
-    null_count_2 = x_test_read.isnull().sum()
-    print(null_count_2)
+    # Returning the training and testing datasets
+    return x_train, x_test, y_train, y_test
 
-    y_train_read = pd.read_csv('y_train.csv')
-    null_count_3 = y_train_read.isnull().sum()
-    print(null_count_3)
+def csv_concat(train_1, test_1, train_2, test_2):
+    """
+    Combining the 'train' files(x_train.csv and y_train.csv)
+    and the 'test' files(x_test.csv and y_test.csv)
+    """
+    # Reading the csv files
+    x_train = pd.read_csv(train_1)
+    y_train = pd.read_csv(train_2)
+    x_test = pd.read_csv(test_1)
+    y_test = pd.read_csv(test_2)
 
-    y_test_read = pd.read_csv('y_test.csv')
-    null_count_4 = y_test_read.isnull().sum()
-    print(null_count_4)
-    '''
+    # Merging the 'train' files
+    train_data = pd.concat([x_train, y_train], axis=1)
+    train_data.to_csv('train.csv')
+
+    # Merging the 'test' files
+    test_data = pd.concat([x_test, y_test], axis=1)
+    test_data.to_csv('test.csv')
 
 # Writing the main function
 if __name__ == '__main__':
@@ -59,4 +64,5 @@ if __name__ == '__main__':
     INPUT_FILE = 'housing.csv'
 
     # Calling the function
-    data_pre_processing(INPUT_FILE)
+    # data_pre_processing(INPUT_FILE)
+    csv_concat('x_train.csv', 'x_test.csv', 'y_train.csv', 'y_test.csv')
