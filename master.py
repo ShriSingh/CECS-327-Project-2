@@ -7,6 +7,13 @@ from sklearn.model_selection import train_test_split
 import socket as soc
 import struct
 import sys
+import time
+
+# Storing the input file name
+INPUT_FILE = 'housing.csv'
+# Defining the multicast group address and port
+MULTICAST_GROUP = '224.3.29.71'
+SERVER_ADDRESS = ('', 10000)
 
 def data_pre_processing(file):
     """
@@ -36,11 +43,50 @@ def data_pre_processing(file):
     test_data = pd.concat([x_test, y_test], axis=1)
     test_data.to_csv('test.csv')
 
+def send_file_multicast(option: int):
+    """
+    Sends a file(either train/test dataset) to the multicast group
+    :param: option - An integer to determine what file to send
+    """
+    # Setting what file to send based on the option
+    if option == 1:
+        payload_file = open('train.csv', 'rb')
+    elif option == 2:
+        payload_file = open('test.csv', 'rb')
+    else:
+        print('Invalid option!')
+
+    # Opening a socket to a UDP socket
+    set_socket = soc.socket(soc.AF_INET, soc.SOCK_DGRAM)
+    # Setting the time-to-live for file to 1 so they don't go past the local network segment
+    file_lifespan = struct.pack('b', 1)
+    set_socket.setsockopt(soc.IPPROTO_IP, soc.IP_MULTICAST_TTL, file_lifespan)
+
+    # Reading the file
+    payload = payload_file.read(1024)
+
+    # Sending the file to the multicast group
+    while payload:
+        set_socket.sendto(payload, (MULTICAST_GROUP, 10000))
+        payload = payload_file.read(1024)
+        time.sleep(0.01)
+
+    # Closing the file
+    payload_file.close()
+    # Closing the socket
+    print('Closing socket...', file=sys.stderr)
+    set_socket.close()
+
+def receiver():
+    """
+    Listens to the multicast group for the prompt.
+    Based on the prompt, instructs master to send the training or testing dataset.
+    """
+
 
 # Writing the main function
 if __name__ == '__main__':
-    # Storing the input file name
-    INPUT_FILE = 'housing.csv'
-
     # Calling the functions
     data_pre_processing(INPUT_FILE)
+    receiver()
+
