@@ -19,10 +19,6 @@ def data_pre_processing(file):
 
     # Dropping the rows that are null
     modified_data = data_read.dropna()
-
-    # Checking the number of the rows that are null
-    # null_count = data_read.isnull().sum()
-    # print(null_count)
     
     # Assigning the rows(x-values) and columns(y-values) for the data without missing values
     independent_var = modified_data[['longitude', 'latitude', 'housing_median_age' , 'total_rooms', 'total_bedrooms',
