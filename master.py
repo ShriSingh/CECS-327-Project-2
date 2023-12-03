@@ -55,6 +55,8 @@ def send_file_multicast(option: int):
     else:
         print('Invalid option!')
 
+    # Opening the socket
+    print('Opening socket...', file=sys.stderr)
     # Opening a socket to a UDP socket
     set_socket = soc.socket(soc.AF_INET, soc.SOCK_DGRAM)
     # Setting the time-to-live for file to 1 so they don't go past the local network segment
@@ -70,6 +72,8 @@ def send_file_multicast(option: int):
         payload = payload_file.read(1024)
         time.sleep(0.01)
 
+    # Indicating that the file has been sent
+    print('File sent!', file=sys.stderr)
     # Closing the file
     payload_file.close()
     # Closing the socket
