@@ -7,26 +7,27 @@ import sys
 from io import StringIO
 
 # Defining the multicast group address and port
-multicast_group = '224.3.29.71'
-server_address = ('', 10000)
-regressor = LinearRegression()
+MULTICAST_GROUP = '224.3.29.71'
+SERVER_ADDRESS = ('', 10000)
+REGRESSOR = LinearRegression()
 
 
 # Reference: https://pymotw.com/2/socket/multicast.html
 def listen(n): #n == 1: for training 2: for testing
     """
     A function to receive and acknowledge a message from a multicast group
+    :param n: An integer to indicate the state for the node to either train or test
     """
 
     # Create the socket
     multicast_node_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     # Bind to the server address
-    multicast_node_socket.bind(server_address)
+    multicast_node_socket.bind(SERVER_ADDRESS)
 
     # Tell the operating system to add the socket to the multicast group
     # on all interfaces.
-    group = socket.inet_aton(multicast_group)
+    group = socket.inet_aton(MULTICAST_GROUP)
     mreq = struct.pack('4sL', group, socket.INADDR_ANY)
     multicast_node_socket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
@@ -75,7 +76,7 @@ def training(train_data):
     y_train = df.iloc[:,-1].values
 
     # Build a linear regression model with X_train, y_train
-    regressor.fit(X_train ,y_train) 
+    REGRESSOR.fit(X_train ,y_train) 
     
 
 def testing(test_data):
@@ -84,7 +85,7 @@ def testing(test_data):
     X_test = df.iloc[:,:].values 
 
     # Predict the test set results y_pred (y_hat) from X_test
-    y_pred = regressor.predict(X_test)
+    y_pred = REGRESSOR.predict(X_test)
     
     return y_pred
 
