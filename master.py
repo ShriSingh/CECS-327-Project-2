@@ -1,7 +1,6 @@
 # Libraries for data pre-processing
 import numpy as np
 import pandas as pd
-import os
 from sklearn.model_selection import train_test_split
 # Libraries for doing multicasting
 import socket as soc
@@ -80,13 +79,18 @@ def send_file_multicast(option: int):
 def receiver():
     """
     Listens to the multicast group for the prompt.
-    Based on the prompt, instructs master to send the training or testing dataset.
+    Based on the prompt, instructs master to send the 
+    training or testing dataset.
     """
+    pass
 
 
 # Writing the main function
 if __name__ == '__main__':
-    # Calling the functions
+    # Doing data pre-processing
     data_pre_processing(INPUT_FILE)
+    # Sending the training dataset to the multicast group
+    send_file_multicast(1)
+    # Activating the receiver to listen to the multicast group
     receiver()
 
