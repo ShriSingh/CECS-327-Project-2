@@ -75,8 +75,11 @@ def training(train_data):
     X_train = df.iloc[:,:-1].values 
     y_train = df.iloc[:,-1].values
 
+    print(X_train)
+    print(y_train)
     # Build a linear regression model with X_train, y_train
     REGRESSOR.fit(X_train ,y_train) 
+    print('Received successfully from master!') 
     
 
 def testing(test_data):
@@ -90,10 +93,10 @@ def testing(test_data):
     return y_pred
 
 if __name__ == '__main__':
-    listen()
+    listen(1)
     # training()
 
-    listen()
+    listen(2)
     # testing()
 
 
