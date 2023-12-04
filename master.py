@@ -16,24 +16,33 @@ SERVER_ADDRESS = ('', 10000)
 
 def data_pre_processing(file):
     """
-    Removing the null rows from the data in the csv file,
-    splitting the data into training and testing datasets,
-    and storing the training and testing datasets into csv files.
+    Removing the null rows from the data in the csv file, making sure all 
+    the values are integers, splitting the data into training and testing 
+    datasets, and storing the training and testing datasets into csv files.
     """
     # Reading the csv file
     data_read = pd.read_csv(file)
 
     # Dropping the rows that are null
     modified_data = data_read.dropna()
-    
+
+    # Changing the values in the 'ocean_proximity' column to integers
+    # Uses the conversion: ISLAND = 1, NEAR OCEAN = 2, NEAR BAY = 3, <1H OCEAN = 4, INLAND = 5
+    modified_data.loc[modified_data['ocean_proximity'] == 'ISLAND', 'ocean_proximity'] = 1
+    modified_data.loc[modified_data['ocean_proximity'] == 'NEAR OCEAN', 'ocean_proximity'] = 2
+    modified_data.loc[modified_data['ocean_proximity'] == 'NEAR BAY', 'ocean_proximity'] = 3
+    modified_data.loc[modified_data['ocean_proximity'] == '<1H OCEAN', 'ocean_proximity'] = 4
+    modified_data.loc[modified_data['ocean_proximity'] == 'INLAND', 'ocean_proximity'] = 5
+
     # Assigning the rows(x-values) and columns(y-values) for the data without missing values
-    independent_var = modified_data[['longitude', 'latitude', 'housing_median_age' , 'total_rooms', 'total_bedrooms',
-                                     'population', 'households', 'median_income', 'ocean_proximity']]
+    independent_var = modified_data[['longitude', 'latitude', 'housing_median_age', 
+                                     'total_rooms', 'total_bedrooms','population', 
+                                     'households', 'median_income', 'ocean_proximity']]
     dependent_var = modified_data['median_house_value']
 
     # Splitting the data into training and testing datasets
     x_train, x_test, y_train, y_test = train_test_split(independent_var, dependent_var, test_size=0.25, random_state=42)
-
+    
     # Merging the x_train and y_train datasets into one 'train' file
     train_data = pd.concat([x_train, y_train], axis=1)
     train_data.to_csv('train.csv')
@@ -97,4 +106,3 @@ if __name__ == '__main__':
     send_file_multicast(1)
     # Activating the receiver to listen to the multicast group
     receiver()
-
