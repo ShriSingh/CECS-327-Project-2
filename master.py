@@ -1,12 +1,13 @@
-# Libraries for data pre-processing
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split
 # Libraries for doing multicasting
 import socket as soc
 import struct
 import sys
 import time
+# Libraries for data pre-processing
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
 
 # Storing the input file name
 INPUT_FILE = 'housing.csv'
@@ -56,13 +57,14 @@ def send_file_multicast(option: int):
     Sends a file(either train/test dataset) to the multicast group
     :param: option - An integer to determine what file to send
     """
+    # Initializing the payload file
+    payload_file = open('housing.csv', 'rb') # -> This is just a placeholder to not get an error
+
     # Setting what file to send based on the option
     if option == 1:
         payload_file = open('train.csv', 'rb')
     elif option == 2:
         payload_file = open('test.csv', 'rb')
-    else:
-        print('Invalid option!')
 
     # Opening the socket
     print('Opening socket...', file=sys.stderr)
@@ -79,7 +81,7 @@ def send_file_multicast(option: int):
     while payload:
         set_socket.sendto(payload, (MULTICAST_GROUP, 10000))
         payload = payload_file.read(1024)
-        time.sleep(0.01)
+        time.sleep(0.02)
 
     # Indicating that the file has been sent
     print('File sent!', file=sys.stderr)
@@ -95,8 +97,54 @@ def receiver():
     Based on the prompt, instructs master to send the 
     training or testing dataset.
     """
-    pass
+    # Creating a socket
+    print('Creating socket...', file=sys.stderr)
+    # Opening the socket to a UDP socket
+    node_to_master_socket = soc.socket(soc.AF_INET, soc.SOCK_DGRAM)
+    # Binding the socket to the server address
+    node_to_master_socket.bind(SERVER_ADDRESS)
 
+    # Telling the operating system to add the socket to the multicast group
+    # on all interfaces.
+    print('Adding socket to multicast group...', file=sys.stderr)
+    group = soc.inet_aton(MULTICAST_GROUP)
+    mreq = struct.pack('4sL', group, soc.INADDR_ANY)
+    node_to_master_socket.setsockopt(soc.IPPROTO_IP, soc.IP_ADD_MEMBERSHIP, mreq)
+
+    # Listening to the multicast group
+    while True:
+        print('\nWaiting to receive message...', file=sys.stderr)
+        # Handle multicast data received on multicast_socket
+        data, address = node_to_master_socket.recvfrom(1024)
+
+        # Decoding the bytes to translate it to a string and the send time
+        decoded_data = data.decode()
+
+        # Break the while loop when socket receive data
+        if data: 
+            break
+
+    # Indicating the data has been received
+    print('Received successfully from node!', file=sys.stderr)
+
+    # Checking the prompt
+    if decoded_data == 'train':
+        # Sending the training dataset to the multicast group
+        send_file_multicast(1)
+    elif decoded_data == 'test':
+        # Sending the testing dataset to the multicast group
+        send_file_multicast(2)
+    elif decoded_data == 'ack':
+        print('Training completed successfully!')
+        accuracy_measurement(decoded_data)
+
+def accuracy_measurement(result):
+    """
+    Figures out how accurate the model is by comparing 
+    the predicted values sent with the actual values.
+    :param result: The predicted values sent from the node
+    """
+    pass
 
 # Writing the main function
 if __name__ == '__main__':
@@ -106,3 +154,6 @@ if __name__ == '__main__':
     send_file_multicast(1)
     # Activating the receiver to listen to the multicast group
     receiver()
+    # Closes out the program
+    sys.exit(0)
+    
