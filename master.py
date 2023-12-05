@@ -85,7 +85,7 @@ def send_file_multicast(option: int):
         set_socket.sendto(payload, (MULTICAST_GROUP, 10000))
         payload = payload_file.read(10248)
         count += 1
-        time.sleep(0.02)
+        time.sleep(0.05)
     print(count)
     # Indicating that the file has been sent
     print('File sent!', file=sys.stderr)
@@ -142,6 +142,7 @@ def receiver():
         send_file_multicast(2)
     elif decoded_data == 'ack':
         print('Training completed successfully!')
+        time.sleep(0.1)
         send_file_multicast(2)
         accuracy_measurement(decoded_data)
 

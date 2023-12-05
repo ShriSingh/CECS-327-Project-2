@@ -1,14 +1,15 @@
 import socket
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LinearRegression
 import struct
 import sys
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVR
 
 # Defining the multicast group address and port
 MULTICAST_GROUP = '224.3.29.71'
 SERVER_ADDRESS = ('', 10000)
-REGRESSOR = LinearRegression()
+REGRESSOR = SVR(kernel='rbf')
 
 
 # Reference: https://pymotw.com/2/socket/multicast.html
@@ -60,7 +61,7 @@ def listen(n): #n == 1: for training 2: for testing
             break
         count += 1
 
-    print('Received successfully from node 1!') 
+    print('Received successfully from node 2!') 
     # fo.close()
     if n == 1:
         training()
@@ -73,7 +74,7 @@ def listen(n): #n == 1: for training 2: for testing
 
 def training():
     """
-    Training the linear regression model
+    Training the Support Vector Regression model
     :param train_data: the training data
     """
     
@@ -86,10 +87,15 @@ def training():
     X_train = df.iloc[:,:-1].astype(float) #convert string to float
     y_train = df.iloc[:,-1].astype(float)
 
-    # print(X_train)
-    # print(y_train)
-    # Build a linear regression model with X_train, y_train
-    REGRESSOR.fit(X_train ,y_train) 
+    # Feature Scaling
+    sc_X = StandardScaler()
+    sc_y = StandardScaler()
+    
+    X_train = sc_X.fit_transform(X_train)
+    y_train = np.array(y_train).reshape(-1,1)
+    y_train = sc_y.fit_transform(y_train)
+
+    REGRESSOR.fit(X_train,y_train)
     print('Node2:Training completed!') 
     
 
@@ -100,7 +106,7 @@ def testing():
 
     # Predict the test set results y_pred (y_hat) from X_test
     y_pred = REGRESSOR.predict(X_test)
-    print('Node2:Predicting completed!') 
+    print('Node2:Prediction completed!') 
     # print(y_pred)
 
     return y_pred

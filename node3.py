@@ -2,14 +2,16 @@ import socket
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
 import struct
 import sys
 
 # Defining the multicast group address and port
 MULTICAST_GROUP = '224.3.29.71'
 SERVER_ADDRESS = ('', 10000)
-REGRESSOR = LinearRegression()
-
+REGRESSOR = LinearRegression()    
+# create an instance of PolynomialFeatures with degree=4
+POLY = PolynomialFeatures(degree=4)
 
 # Reference: https://pymotw.com/2/socket/multicast.html
 def listen(n): #n == 1: for training 2: for testing
@@ -64,7 +66,7 @@ def listen(n): #n == 1: for training 2: for testing
     # fo.close()
     if n == 1:
         training()
-        # let master know it has finished training
+        # let master know it has finished training 
         multicast_node_socket.sendto('ack'.encode(),(MULTICAST_GROUP, 10000))
     else:
         y_pred = testing()
@@ -88,9 +90,13 @@ def training():
 
     # print(X_train)
     # print(y_train)
-    # Build a linear regression model with X_train, y_train
-    REGRESSOR.fit(X_train ,y_train) 
-    print('Node2:Training completed!') 
+    # transform the features using fit_transform method of poly
+    X_poly = POLY.fit_transform(X_train,y_train)
+
+    # fit
+    REGRESSOR.fit(X_poly,y_train)
+
+    print('Node3:Training completed!') 
     
 
 def testing():
@@ -99,9 +105,9 @@ def testing():
     X_test = df.iloc[:,:-1].astype(float)
 
     # Predict the test set results y_pred (y_hat) from X_test
-    y_pred = REGRESSOR.predict(X_test)
-    print('Node2:Predicting completed!') 
-    # print(y_pred)
+    y_pred = REGRESSOR.predict(POLY.transform(X_test))
+    print('Node3:Prediction completed!') 
+    print(y_pred)
 
     return y_pred
 
