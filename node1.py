@@ -70,8 +70,13 @@ def training(train_data):
     Training the linear regression model
     :param train_data: the training data
     """
+    train_data =  train_data[1:]
+    print(train_data)
     # Import data from train_data.csv file into a DataFrame
-    df = pd.read_csv(StringIO(train_data)) #can change to io.StringIO(train_data), sep="," if this doesnt work
+    df = pd.DataFrame([train_data.split(',') for x in train_data.split('\n')[1:]],  #spliting columns by ',', rows by '\n'
+                           columns=[x for x in train_data.split('\n')[0].split(';')]) #using first row as column name
+    print(df)
+    # print("spliting data to X and y")
     X_train = df.iloc[:,:-1].values 
     y_train = df.iloc[:,-1].values
 
