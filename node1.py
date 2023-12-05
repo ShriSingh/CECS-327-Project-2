@@ -31,70 +31,81 @@ def listen(n): #n == 1: for training 2: for testing
     mreq = struct.pack('4sL', group, socket.INADDR_ANY)
     multicast_node_socket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
+    #determine which file to save
+    if n==1:
+        filename = 'train_data.csv'
+    else:
+        filename = 'test_data.csv'
+    fo = open(filename, "w") 
+
+    count = 0 # counting how many times do we need to send all data
     while True:
         print('\nWaiting to receive message...', file=sys.stderr)
+        print(count)
         # Handle multicast data received on multicast_socket
-        data, address = multicast_node_socket.recvfrom(1024)
-
+        data, address = multicast_node_socket.recvfrom(10248)
         
         # Decoding the bytes to translate it to a string and the send time
         decoded_data = data.decode()
+        # print(decoded_data)
 
-        # Break the while loop when socket receive data
-        if data: 
-            break
+        # Creating a new file at server end and writing the data 
+    
         
-    # # Creating a new file at server end and writing the data 
-    # filename = 'train_data'+'.csv'
-    # fileno = fileno+1
-    # fo = open(filename, "w") 
-    # while data: 
-    #     if not data:
-    #         break
-    #     else: 
-    #         fo.write(decoded_msg) 
+        if data: 
+            if decoded_data == 'File sent!':
+                break
+            else: 
+                fo.write(decoded_data) 
+        else:
+            print("uhhh")
+            break
+        count += 1
 
     print('Received successfully from node 1!') 
     # fo.close()
     if n == 1:
-        training(decoded_data)
+        training()
         # let master know it has finished training
         multicast_node_socket.sendto(str("ack").encode(),address)
     else:
-        y_pred = testing(decoded_data)
+        y_pred = testing()
         # send the predicted result to master
         multicast_node_socket.sendto(str(y_pred).encode(),address)
 
-def training(train_data):
+def training():
     """
     Training the linear regression model
     :param train_data: the training data
     """
-    train_data =  train_data[1:]
-    print(train_data)
+    
+    # train_data =  train_data[1:]
+    df = pd.read_csv('train_data.csv')
     # Import data from train_data.csv file into a DataFrame
-    df = pd.DataFrame([train_data.split(',') for x in train_data.split('\n')[1:]],  #spliting columns by ',', rows by '\n'
-                           columns=[x for x in train_data.split('\n')[0].split(';')]) #using first row as column name
+    # df = pd.DataFrame([x.split(',') for x in train_data.split('\n')[1:]],  #spliting columns by ',', rows by '\n'
+    #                        columns=[x for x in train_data.split('\n')[0].split(',')]) #using first row as column name
+    # # df = pd.DataFrame([x.split(',') for x in train_data.split('\n')[1:]]
     print(df)
     # print("spliting data to X and y")
-    X_train = df.iloc[:,:-1].values 
-    y_train = df.iloc[:,-1].values
+    X_train = df.iloc[:,:-1].astype(float) #convert string to float
+    y_train = df.iloc[:,-1].astype(float)
 
     print(X_train)
     print(y_train)
     # Build a linear regression model with X_train, y_train
     REGRESSOR.fit(X_train ,y_train) 
-    print('Received successfully from master!') 
+    print('Node1:Training completed!') 
     
 
-def testing(test_data):
+def testing():
     # Import data from train_data.csv file into a DataFrame
-    df = pd.read_csv(StringIO(test_data))
+    df = pd.read_csv('test_data.csv')
     X_test = df.iloc[:,:].values 
 
     # Predict the test set results y_pred (y_hat) from X_test
     y_pred = REGRESSOR.predict(X_test)
-    
+    print('Node1:Predicting completed!') 
+
     return y_pred
 
 if __name__ == '__main__':

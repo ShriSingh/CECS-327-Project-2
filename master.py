@@ -23,9 +23,11 @@ def data_pre_processing(file):
     """
     # Reading the csv file
     data_read = pd.read_csv(file)
+    print(len(data_read))
 
     # Dropping the rows that are null
     modified_data = data_read.dropna()
+    print(len(modified_data))
 
     # Changing the values in the 'ocean_proximity' column to integers
     # Uses the conversion: ISLAND = 1, NEAR OCEAN = 2, NEAR BAY = 3, <1H OCEAN = 4, INLAND = 5
@@ -46,11 +48,11 @@ def data_pre_processing(file):
     
     # Merging the x_train and y_train datasets into one 'train' file
     train_data = pd.concat([x_train, y_train], axis=1)
-    train_data.to_csv('train.csv')
+    train_data.to_csv('train.csv',index=False)
 
     # Merging the x_test and y_test datasets into one 'test' file
     test_data = pd.concat([x_test, y_test], axis=1)
-    test_data.to_csv('test.csv')
+    test_data.to_csv('test.csv',index=False)
 
 def send_file_multicast(option: int):
     """
@@ -75,16 +77,20 @@ def send_file_multicast(option: int):
     set_socket.setsockopt(soc.IPPROTO_IP, soc.IP_MULTICAST_TTL, file_lifespan)
 
     # Reading the file
-    payload = payload_file.read(1024)
+    payload = payload_file.read(10248)
+    count = 0 # keeping track of how many times do we need to send all data
 
     # Sending the file to the multicast group
     while payload:
         set_socket.sendto(payload, (MULTICAST_GROUP, 10000))
-        payload = payload_file.read(1024)
+        payload = payload_file.read(10248)
+        count += 1
         time.sleep(0.02)
-
+    print(count)
     # Indicating that the file has been sent
     print('File sent!', file=sys.stderr)
+    set_socket.sendto('File sent!'.encode(), (MULTICAST_GROUP, 10000))
+
     # Closing the file
     payload_file.close()
     # Closing the socket
