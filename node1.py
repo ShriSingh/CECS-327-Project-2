@@ -58,7 +58,7 @@ def listen(n): #n == 1: for training 2: for testing
             else: 
                 fo.write(decoded_data) 
         else:
-            print("uhhh")
+            print("uhhh thats not suppposed to happen")
             break
         count += 1
 
@@ -67,11 +67,11 @@ def listen(n): #n == 1: for training 2: for testing
     if n == 1:
         training()
         # let master know it has finished training
-        multicast_node_socket.sendto(str("ack").encode(),address)
+        multicast_node_socket.sendto('ack'.encode(),(MULTICAST_GROUP, 10000))
     else:
         y_pred = testing()
         # send the predicted result to master
-        multicast_node_socket.sendto(str(y_pred).encode(),address)
+        multicast_node_socket.sendto(str(y_pred).encode(),(MULTICAST_GROUP, 10000))
 
 def training():
     """
@@ -79,19 +79,17 @@ def training():
     :param train_data: the training data
     """
     
-    # train_data =  train_data[1:]
     df = pd.read_csv('train_data.csv')
     # Import data from train_data.csv file into a DataFrame
     # df = pd.DataFrame([x.split(',') for x in train_data.split('\n')[1:]],  #spliting columns by ',', rows by '\n'
     #                        columns=[x for x in train_data.split('\n')[0].split(',')]) #using first row as column name
-    # # df = pd.DataFrame([x.split(',') for x in train_data.split('\n')[1:]]
-    print(df)
+
     # print("spliting data to X and y")
     X_train = df.iloc[:,:-1].astype(float) #convert string to float
     y_train = df.iloc[:,-1].astype(float)
 
-    print(X_train)
-    print(y_train)
+    # print(X_train)
+    # print(y_train)
     # Build a linear regression model with X_train, y_train
     REGRESSOR.fit(X_train ,y_train) 
     print('Node1:Training completed!') 
@@ -100,20 +98,19 @@ def training():
 def testing():
     # Import data from train_data.csv file into a DataFrame
     df = pd.read_csv('test_data.csv')
-    X_test = df.iloc[:,:].values 
+    X_test = df.iloc[:,:-1].astype(float)
 
     # Predict the test set results y_pred (y_hat) from X_test
     y_pred = REGRESSOR.predict(X_test)
     print('Node1:Predicting completed!') 
+    # print(y_pred)
 
     return y_pred
 
 if __name__ == '__main__':
     listen(1)
-    # training()
-
     listen(2)
-    # testing()
+
 
 
     

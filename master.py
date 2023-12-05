@@ -142,6 +142,7 @@ def receiver():
         send_file_multicast(2)
     elif decoded_data == 'ack':
         print('Training completed successfully!')
+        send_file_multicast(2)
         accuracy_measurement(decoded_data)
 
 def accuracy_measurement(result):
