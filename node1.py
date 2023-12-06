@@ -53,6 +53,8 @@ def listen(n): #n == 1: for training 2: for testing
         if data: 
             if decoded_data == 'File sent!':
                 break
+            elif decoded_data == 'ack':
+                continue
             else: 
                 fo.write(decoded_data) 
         else:
@@ -90,7 +92,7 @@ def training():
     # print(y_train)
     # Build a linear regression model with X_train, y_train
     REGRESSOR.fit(X_train ,y_train) 
-    print('Node2:Training completed!') 
+    print('Node1:Training completed!') 
     
 
 def testing():
@@ -100,7 +102,7 @@ def testing():
 
     # Predict the test set results y_pred (y_hat) from X_test
     y_pred = REGRESSOR.predict(X_test)
-    print('Node2:Predicting completed!') 
+    print('Node1:Predicting completed!') 
     # print(y_pred)
 
     return y_pred

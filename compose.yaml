@@ -13,27 +13,27 @@ services:
     networks:
       - the-network
 
-  # # Worker node 1
-  # node1:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile-node1
-  #   ports:
-  #     - "5001:5000"
-  #   command: ["python", "node1.py"]
-  #   networks:
-  #     - the-network
+  # Worker node 1
+  node1:
+    build:
+      context: .
+      dockerfile: Dockerfile-node1
+    ports:
+      - "5001:5000"
+    command: ["python", "node1.py"]
+    networks:
+      - the-network
 
-  # # Worker node 2
-  # node2:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile-node2
-  #   ports:
-  #     - "5002:5000"
-  #   command: ["python", "node2.py"]
-  #   networks:
-  #     - the-network
+  # Worker node 2
+  node2:
+    build:
+      context: .
+      dockerfile: Dockerfile-node2
+    ports:
+      - "5002:5000"
+    command: ["python", "node2.py"]
+    networks:
+      - the-network
 
   # Worker node 3
   node3:
@@ -46,16 +46,6 @@ services:
     networks:
       - the-network
 
-  # # Worker node 4
-  # node4:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile-node4
-  #   ports:
-  #     - "5004:5000"
-  #   command: ["python", "node4.py"]
-  #   networks:
-  #     - the-network
 
 
 

@@ -55,6 +55,8 @@ def listen(n): #n == 1: for training 2: for testing
         if data: 
             if decoded_data == 'File sent!':
                 break
+            elif decoded_data == 'ack':
+                continue
             else: 
                 fo.write(decoded_data) 
         else:
@@ -62,7 +64,7 @@ def listen(n): #n == 1: for training 2: for testing
             break
         count += 1
 
-    print('Received successfully from node 1!') 
+    print('Received successfully from node 3!') 
     # fo.close()
     if n == 1:
         training()
@@ -107,7 +109,7 @@ def testing():
     # Predict the test set results y_pred (y_hat) from X_test
     y_pred = REGRESSOR.predict(POLY.transform(X_test))
     print('Node3:Prediction completed!') 
-    print(y_pred)
+    # print(y_pred)
 
     return y_pred
 

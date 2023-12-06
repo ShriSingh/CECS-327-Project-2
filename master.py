@@ -14,6 +14,7 @@ INPUT_FILE = 'housing.csv'
 # Defining the multicast group address and port
 MULTICAST_GROUP = '224.3.29.71'
 SERVER_ADDRESS = ('', 10000)
+NODES_COUNT = 3 #the total number of work nodes
 
 def data_pre_processing(file):
     """
@@ -117,8 +118,13 @@ def receiver():
     mreq = struct.pack('4sL', group, soc.INADDR_ANY)
     node_to_master_socket.setsockopt(soc.IPPROTO_IP, soc.IP_ADD_MEMBERSHIP, mreq)
 
+    # Initilizing the count of nodes that have completed model training 
+    ackcount = 0
+    # Initilizing the count of nodes that have completed model predicting
+    predcount = 0 
+
     # Listening to the multicast group
-    while True:
+    while predcount < NODES_COUNT:
         print('\nWaiting to receive message...', file=sys.stderr)
         # Handle multicast data received on multicast_socket
         data, address = node_to_master_socket.recvfrom(1024)
@@ -126,25 +132,29 @@ def receiver():
         # Decoding the bytes to translate it to a string and the send time
         decoded_data = data.decode()
 
-        # Break the while loop when socket receive data
-        if data: 
-            break
+        # # Break the while loop when socket receive data
+        # if data: 
+        #     break
 
-    # Indicating the data has been received
-    print('Received successfully from node!', file=sys.stderr)
+        # Indicating the data has been received
+        print('Received successfully from node!', file=sys.stderr)
 
-    # Checking the prompt
-    if decoded_data == 'train':
-        # Sending the training dataset to the multicast group
-        send_file_multicast(1)
-    elif decoded_data == 'test':
-        # Sending the testing dataset to the multicast group
-        send_file_multicast(2)
-    elif decoded_data == 'ack':
-        print('Training completed successfully!')
-        time.sleep(0.1)
-        send_file_multicast(2)
-        accuracy_measurement(decoded_data)
+        # Checking the prompt
+        if decoded_data == 'train':
+            # Sending the training dataset to the multicast group
+            send_file_multicast(1)
+        elif decoded_data == 'test':
+            # Sending the testing dataset to the multicast group
+            send_file_multicast(2)
+        elif decoded_data == 'ack':
+            ackcount += 1
+            print(f'{ackcount} nodes training completed successfully!') 
+            if ackcount >= NODES_COUNT:
+                time.sleep(0.1)
+                send_file_multicast(2)
+        else: 
+            predcount += 1
+            accuracy_measurement(decoded_data)
 
 def accuracy_measurement(result):
     """

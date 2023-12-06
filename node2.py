@@ -54,6 +54,8 @@ def listen(n): #n == 1: for training 2: for testing
         if data: 
             if decoded_data == 'File sent!':
                 break
+            elif decoded_data == 'ack':
+                continue            
             else: 
                 fo.write(decoded_data) 
         else:
