@@ -87,16 +87,16 @@ def training():
     #                        columns=[x for x in train_data.split('\n')[0].split(',')]) #using first row as column name
 
     # print("spliting data to X and y")
-    X_train = df.iloc[:,:-1].astype(float) #convert string to float
+    x_train = df.iloc[:,:-1].astype(float) #convert string to float
     y_train = df.iloc[:,-1].astype(float)
 
     # print(X_train)
     # print(y_train)
     # transform the features using fit_transform method of poly
-    X_poly = POLY.fit_transform(X_train,y_train)
+    x_poly = POLY.fit_transform(x_train,y_train)
 
     # fit
-    REGRESSOR.fit(X_poly,y_train)
+    REGRESSOR.fit(x_poly,y_train)
 
     print('Node3:Training completed!') 
     
@@ -104,10 +104,10 @@ def training():
 def testing():
     # Import data from train_data.csv file into a DataFrame
     df = pd.read_csv('test_data.csv')
-    X_test = df.iloc[:,:-1].astype(float)
+    x_test = df.iloc[:,:-1].astype(float)
 
     # Predict the test set results y_pred (y_hat) from X_test
-    y_pred = REGRESSOR.predict(POLY.transform(X_test))
+    y_pred = REGRESSOR.predict(POLY.transform(x_test))
     print('Node3:Prediction completed!') 
     # print(y_pred)
 

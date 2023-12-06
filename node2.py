@@ -86,28 +86,28 @@ def training():
     #                        columns=[x for x in train_data.split('\n')[0].split(',')]) #using first row as column name
 
     # print("spliting data to X and y")
-    X_train = df.iloc[:,:-1].astype(float) #convert string to float
+    x_train = df.iloc[:,:-1].astype(float) #convert string to float
     y_train = df.iloc[:,-1].astype(float)
 
     # Feature Scaling
     sc_X = StandardScaler()
     sc_y = StandardScaler()
     
-    X_train = sc_X.fit_transform(X_train)
+    x_train = sc_X.fit_transform(x_train)
     y_train = np.array(y_train).reshape(-1,1)
     y_train = sc_y.fit_transform(y_train)
 
-    REGRESSOR.fit(X_train,y_train)
+    REGRESSOR.fit(x_train,y_train)
     print('Node2:Training completed!') 
     
 
 def testing():
     # Import data from train_data.csv file into a DataFrame
     df = pd.read_csv('test_data.csv')
-    X_test = df.iloc[:,:-1].astype(float)
+    x_test = df.iloc[:,:-1].astype(float)
 
     # Predict the test set results y_pred (y_hat) from X_test
-    y_pred = REGRESSOR.predict(X_test)
+    y_pred = REGRESSOR.predict(x_test)
     print('Node2:Prediction completed!') 
     # print(y_pred)
 
