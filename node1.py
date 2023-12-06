@@ -31,7 +31,7 @@ def listen(n): #n == 1: for training 2: for testing
     multicast_node_socket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
     #determine which file to save
-    if n==1:
+    if n == 1:
         filename = 'train_data.csv'
     else:
         filename = 'test_data.csv'
@@ -85,23 +85,23 @@ def training():
     #                        columns=[x for x in train_data.split('\n')[0].split(',')]) #using first row as column name
 
     # print("spliting data to X and y")
-    X_train = df.iloc[:,:-1].astype(float) #convert string to float
+    x_train = df.iloc[:,:-1].astype(float) #convert string to float
     y_train = df.iloc[:,-1].astype(float)
 
     # print(X_train)
     # print(y_train)
     # Build a linear regression model with X_train, y_train
-    REGRESSOR.fit(X_train ,y_train) 
+    REGRESSOR.fit(x_train ,y_train) 
     print('Node1:Training completed!') 
     
 
 def testing():
     # Import data from train_data.csv file into a DataFrame
     df = pd.read_csv('test_data.csv')
-    X_test = df.iloc[:,:-1].astype(float)
+    x_test = df.iloc[:,:-1].astype(float)
 
     # Predict the test set results y_pred (y_hat) from X_test
-    y_pred = REGRESSOR.predict(X_test)
+    y_pred = REGRESSOR.predict(x_test)
     print('Node1:Predicting completed!') 
     # print(y_pred)
 
@@ -110,7 +110,3 @@ def testing():
 if __name__ == '__main__':
     listen(1)
     listen(2)
-
-
-
-    

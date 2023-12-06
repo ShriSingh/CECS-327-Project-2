@@ -33,7 +33,7 @@ def listen(n): #n == 1: for training 2: for testing
     multicast_node_socket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
     #determine which file to save
-    if n==1:
+    if n == 1:
         filename = 'train_data.csv'
     else:
         filename = 'test_data.csv'
@@ -116,7 +116,3 @@ def testing():
 if __name__ == '__main__':
     listen(1)
     listen(2)
-
-
-
-    
