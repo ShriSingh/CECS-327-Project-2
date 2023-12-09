@@ -1,3 +1,4 @@
+"""Polynomial Regression Model"""
 import socket
 import numpy as np
 import pandas as pd
@@ -77,7 +78,7 @@ def listen(n): #n == 1: for training 2: for testing
 
 def training():
     """
-    Training the linear regression model
+    Training the polynomial regression model
     :param train_data: the training data
     """
     

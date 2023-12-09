@@ -1,3 +1,4 @@
+"""Support Vector Regression model"""
 import socket
 import numpy as np
 import pandas as pd

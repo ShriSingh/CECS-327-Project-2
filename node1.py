@@ -1,3 +1,4 @@
+"""Linear Regression Model"""
 import socket
 import numpy as np
 import pandas as pd
