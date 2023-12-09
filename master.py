@@ -4,7 +4,7 @@ import struct
 import sys
 import time
 # Libraries for data pre-processing
-import numpy as np
+# import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -14,12 +14,13 @@ INPUT_FILE = 'housing.csv'
 # Defining the multicast group address and port
 MULTICAST_GROUP = '224.3.29.71'
 SERVER_ADDRESS = ('', 10000)
-NODES_COUNT = 3 #the total number of work nodes
+NODES_COUNT = 3  # the total number of work nodes
+
 
 def data_pre_processing(file):
     """
-    Removing the null rows from the data in the csv file, making sure all 
-    the values are integers, splitting the data into training and testing 
+    Removing the null rows from the data in the csv file, making sure all
+    the values are integers, splitting the data into training and testing
     datasets, and storing the training and testing datasets into csv files.
     """
     # Reading the csv file
@@ -28,32 +29,46 @@ def data_pre_processing(file):
 
     # Dropping the rows that are null
     modified_data = data_read.dropna()
-    print(len(modified_data))
 
     # Changing the values in the 'ocean_proximity' column to integers
-    # Uses the conversion: ISLAND = 1, NEAR OCEAN = 2, NEAR BAY = 3, <1H OCEAN = 4, INLAND = 5
-    modified_data.loc[modified_data['ocean_proximity'] == 'ISLAND', 'ocean_proximity'] = 1
-    modified_data.loc[modified_data['ocean_proximity'] == 'NEAR OCEAN', 'ocean_proximity'] = 2
-    modified_data.loc[modified_data['ocean_proximity'] == 'NEAR BAY', 'ocean_proximity'] = 3
-    modified_data.loc[modified_data['ocean_proximity'] == '<1H OCEAN', 'ocean_proximity'] = 4
-    modified_data.loc[modified_data['ocean_proximity'] == 'INLAND', 'ocean_proximity'] = 5
+    # Uses the conversion: ISLAND = 1, NEAR OCEAN = 2, NEAR BAY = 3, <1H OCEAN
+    # = 4, INLAND = 5
+    modified_data.loc[modified_data['ocean_proximity']
+                      == 'ISLAND', 'ocean_proximity'] = 1
+    modified_data.loc[modified_data['ocean_proximity']
+                      == 'NEAR OCEAN', 'ocean_proximity'] = 2
+    modified_data.loc[modified_data['ocean_proximity']
+                      == 'NEAR BAY', 'ocean_proximity'] = 3
+    modified_data.loc[modified_data['ocean_proximity']
+                      == '<1H OCEAN', 'ocean_proximity'] = 4
+    modified_data.loc[modified_data['ocean_proximity']
+                      == 'INLAND', 'ocean_proximity'] = 5
 
-    # Assigning the rows(x-values) and columns(y-values) for the data without missing values
-    independent_var = modified_data[['longitude', 'latitude', 'housing_median_age', 
-                                     'total_rooms', 'total_bedrooms','population', 
-                                     'households', 'median_income', 'ocean_proximity']]
+    # Assigning the rows(x-values) and columns(y-values) for the data without
+    # missing values
+    independent_var = modified_data[['longitude',
+                                     'latitude',
+                                     'housing_median_age',
+                                     'total_rooms',
+                                     'total_bedrooms',
+                                     'population',
+                                     'households',
+                                     'median_income',
+                                     'ocean_proximity']]
     dependent_var = modified_data['median_house_value']
 
     # Splitting the data into training and testing datasets
-    x_train, x_test, y_train, y_test = train_test_split(independent_var, dependent_var, test_size=0.25, random_state=42)
-    
+    x_train, x_test, y_train, y_test = train_test_split(
+        independent_var, dependent_var, test_size=0.25, random_state=42)
+
     # Merging the x_train and y_train datasets into one 'train' file
     train_data = pd.concat([x_train, y_train], axis=1)
-    train_data.to_csv('train.csv',index=False)
+    train_data.to_csv('train.csv', index=False)
 
-    # Merging the x_test and y_test datasets into one 'test' file
-    test_data = pd.concat([x_test, y_test], axis=1)
-    test_data.to_csv('test.csv',index=False)
+    # Keeping the x_test and y_test datasets separate
+    x_test.to_csv('x_test.csv', index=False)
+    y_test.to_csv('y_test.csv', index=False)
+
 
 def send_file_multicast(option: int):
     """
@@ -61,7 +76,8 @@ def send_file_multicast(option: int):
     :param: option - An integer to determine what file to send
     """
     # Initializing the payload file
-    payload_file = open('housing.csv', 'rb') # -> This is just a placeholder to not get an error
+    # -> This is just a placeholder to not get an error
+    payload_file = open('housing.csv', 'rb')
 
     # Setting what file to send based on the option
     if option == 1:
@@ -73,13 +89,14 @@ def send_file_multicast(option: int):
     print('Opening socket...', file=sys.stderr)
     # Opening a socket to a UDP socket
     set_socket = soc.socket(soc.AF_INET, soc.SOCK_DGRAM)
-    # Setting the time-to-live for file to 1 so they don't go past the local network segment
+    # Setting the time-to-live for file to 1 so they don't go past the local
+    # network segment
     file_lifespan = struct.pack('b', 1)
     set_socket.setsockopt(soc.IPPROTO_IP, soc.IP_MULTICAST_TTL, file_lifespan)
 
     # Reading the file
     payload = payload_file.read(10248)
-    count = 0 # keeping track of how many times do we need to send all data
+    count = 0  # keeping track of how many times do we need to send all data
 
     # Sending the file to the multicast group
     while payload:
@@ -98,10 +115,11 @@ def send_file_multicast(option: int):
     print('Closing socket...', file=sys.stderr)
     set_socket.close()
 
+
 def receiver():
     """
     Listens to the multicast group for the prompt.
-    Based on the prompt, instructs master to send the 
+    Based on the prompt, instructs master to send the
     training or testing dataset.
     """
     # Creating a socket
@@ -116,12 +134,13 @@ def receiver():
     print('Adding socket to multicast group...', file=sys.stderr)
     group = soc.inet_aton(MULTICAST_GROUP)
     mreq = struct.pack('4sL', group, soc.INADDR_ANY)
-    node_to_master_socket.setsockopt(soc.IPPROTO_IP, soc.IP_ADD_MEMBERSHIP, mreq)
+    node_to_master_socket.setsockopt(
+        soc.IPPROTO_IP, soc.IP_ADD_MEMBERSHIP, mreq)
 
-    # Initilizing the count of nodes that have completed model training 
+    # Initilizing the count of nodes that have completed model training
     ackcount = 0
     # Initilizing the count of nodes that have completed model predicting
-    predcount = 0 
+    predcount = 0
 
     # Listening to the multicast group
     while predcount < NODES_COUNT:
@@ -133,7 +152,7 @@ def receiver():
         decoded_data = data.decode()
 
         # # Break the while loop when socket receive data
-        # if data: 
+        # if data:
         #     break
 
         # Indicating the data has been received
@@ -148,30 +167,31 @@ def receiver():
             send_file_multicast(2)
         elif decoded_data == 'ack':
             ackcount += 1
-            print(f'{ackcount} nodes training completed successfully!') 
+            print(f'{ackcount} nodes training completed successfully!')
             if ackcount >= NODES_COUNT:
                 time.sleep(0.1)
                 send_file_multicast(2)
-        else: 
+        else:
             predcount += 1
             accuracy_measurement(decoded_data)
 
+
 def accuracy_measurement(result):
     """
-    Figures out how accurate the model is by comparing 
+    Figures out how accurate the model is by comparing
     the predicted values sent with the actual values.
     :param result: The predicted values sent from the node
     """
     pass
+
 
 # Writing the main function
 if __name__ == '__main__':
     # Doing data pre-processing
     data_pre_processing(INPUT_FILE)
     # Sending the training dataset to the multicast group
-    send_file_multicast(1)
+    # send_file_multicast(1)
     # Activating the receiver to listen to the multicast group
-    receiver()
+    # receiver()
     # Closes out the program
-    sys.exit(0)
-    
+    # sys.exit(0)
