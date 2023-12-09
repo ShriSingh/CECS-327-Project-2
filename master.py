@@ -1,10 +1,11 @@
 # Libraries for doing multicasting
+from operator import le
 import socket as soc
 import struct
 import sys
 import time
 # Libraries for data pre-processing
-# import numpy as np
+import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -25,10 +26,11 @@ def data_pre_processing(file):
     """
     # Reading the csv file
     data_read = pd.read_csv(file)
-    print(len(data_read))
+    # print(len(data_read))
 
     # Dropping the rows that are null
     modified_data = data_read.dropna()
+    # print(len(modified_data))
 
     # Changing the values in the 'ocean_proximity' column to integers
     # Uses the conversion: ISLAND = 1, NEAR OCEAN = 2, NEAR BAY = 3, <1H OCEAN
@@ -83,7 +85,7 @@ def send_file_multicast(option: int):
     if option == 1:
         payload_file = open('train.csv', 'rb')
     elif option == 2:
-        payload_file = open('test.csv', 'rb')
+        payload_file = open('x_test.csv', 'rb')
 
     # Opening the socket
     print('Opening socket...', file=sys.stderr)
@@ -167,7 +169,7 @@ def receiver():
             send_file_multicast(2)
         elif decoded_data == 'ack':
             ackcount += 1
-            print(f'{ackcount} nodes training completed successfully!')
+            print(f'{ackcount} node(s) completed training successfully!')
             if ackcount >= NODES_COUNT:
                 time.sleep(0.1)
                 send_file_multicast(2)
@@ -179,10 +181,14 @@ def receiver():
 def accuracy_measurement(result):
     """
     Figures out how accurate the model is by comparing
-    the predicted values sent with the actual values.
+    the predicted values sent with the actual values
+    (contained in the y_test values).
     :param result: The predicted values sent from the node
     """
-    pass
+    # Reading the file with actual price values
+    actual_prices = pd.read_csv('y_test.csv')
+    # Reading the file with predicted price values
+    predicted_prices = pd.read_csv(result)
 
 
 # Writing the main function
@@ -190,8 +196,8 @@ if __name__ == '__main__':
     # Doing data pre-processing
     data_pre_processing(INPUT_FILE)
     # Sending the training dataset to the multicast group
-    # send_file_multicast(1)
+    send_file_multicast(1)
     # Activating the receiver to listen to the multicast group
-    # receiver()
+    receiver()
     # Closes out the program
-    # sys.exit(0)
+    sys.exit(0)
