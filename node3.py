@@ -1,10 +1,9 @@
 """Polynomial Regression Model"""
 import socket
 import struct
-import sys
-import numpy as np
+# import sys
+# import numpy as np
 import pandas as pd
-# Libraries for accuracy measurement
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 from sklearn.preprocessing import PolynomialFeatures
@@ -17,9 +16,7 @@ REGRESSOR = LinearRegression()
 POLY = PolynomialFeatures(degree=4)
 
 # Reference: https://pymotw.com/2/socket/multicast.html
-
-
-def listen(n):  # n == 1: for training
+def listen(n): # n == 1: for training
     """
     A function to receive and acknowledge a message from a multicast group
     :param n: An integer to indicate the state for the node to either train or test
@@ -53,10 +50,8 @@ def listen(n):  # n == 1: for training
 
         # Decoding the bytes to translate it to a string and the send time
         decoded_data = data.decode()
-        # print(decoded_data)
 
         # Creating a new file at server end and writing the data
-
         if data:
             if decoded_data == 'File sent!':
                 break
@@ -70,7 +65,7 @@ def listen(n):  # n == 1: for training
         count += 1
 
     print('Received successfully from node 3!')
-    # fo.close()
+
     if n == 1:
         training()
         # let master know it has finished training
@@ -90,25 +85,18 @@ def training():
     Training the polynomial regression model
     :param train_data: the training data
     """
-
+    # Reading the training data from the master node
     df = pd.read_csv('train_data.csv')
-    # Import data from train_data.csv file into a DataFrame
-    # df = pd.DataFrame([x.split(',') for x in train_data.split('\n')[1:]],  #spliting columns by ',', rows by '\n'
-    # columns=[x for x in train_data.split('\n')[0].split(',')]) #using first
-    # row as column name
 
     # print("spliting data to X and y")
     x_train = df.iloc[:, :-1].astype(float)  # convert string to float
     y_train = df.iloc[:, -1].astype(float)
 
-    # print(X_train)
-    # print(y_train)
-    # transform the features using fit_transform method of poly
+    # Transforming the features using fit_transform method of poly
     x_poly = POLY.fit_transform(x_train, y_train)
 
-    # Fit the SVM model according to the given training data.
+    # Fitting the SVM model according to the given training data.
     REGRESSOR.fit(x_poly, y_train)
-
     print('Node3: Training completed!')
 
 
@@ -129,37 +117,13 @@ def testing():
     y_pred = REGRESSOR.predict(POLY.transform(x_test))
     print('Node3: Prediction completed!')
 
+    # Calculating the R2 score to measure the accuracy of the model
     accuracy = r2_score(y_test, y_pred)
     print(f"The r2 score for the model is {accuracy * 100}%")
 
-    # Convert the predicted values to a dataframe
-    y_pred_file = pd.DataFrame(y_pred)
-    # Save the predicted values to a csv file
-    y_pred_file.to_csv('y_pred.csv', index=False)
-
-
-def accuracy_measurement(prediction):
-    """
-    Figures out how accurate the model is by calculating
-    the percentage of correct predictions from the y-test(actual prices)
-    dataset. Converts the string of predicted values into a dataframe and
-    calculates the percentage of correct predictions.
-    :param result: The predicted values sent from the node
-    """
-    # Reading the file with actual price values
-    actual_prices = pd.read_csv('y_test.csv')
-
-    # Calculating the percentage of correct predictions
-    accuracy = accuracy_score(actual_prices, prediction)
-
-    # Printing the accuracy
-    print(f"The accuracy of the model is {accuracy * 100}%")
-
 
 if __name__ == '__main__':
+    # Listening to the train the model
     listen(1)
+    # Listening to test the model and calculate the accuracy
     listen(2)
-    # Storing the predicted values
-    y_pred_file = open('y_pred.csv', 'r')
-    # Calculating the accuracy of the model
-    # accuracy_measurement(y_pred_file)

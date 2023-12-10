@@ -1,12 +1,8 @@
 """Linear Regression Model"""
 import socket
 import struct
-import sys
-
-import numpy as np
+# import sys
 import pandas as pd
-# Libraries for accuracy measurement
-from sklearn import metrics
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 
@@ -51,10 +47,8 @@ def listen(n):  # n == 1: for training 2: for testing
 
         # Decoding the bytes to translate it to a string and the send time
         decoded_data = data.decode()
-        # print(decoded_data)
 
         # Creating a new file at server end and writing the data
-
         if data:
             if decoded_data == 'File sent!':
                 break
@@ -68,7 +62,7 @@ def listen(n):  # n == 1: for training 2: for testing
         count += 1
 
     print('Received successfully from node 1!')
-    # fo.close()
+
     if n == 1:
         training()
         # let master know it has finished training
@@ -77,30 +71,24 @@ def listen(n):  # n == 1: for training 2: for testing
         testing()
         # send 'done' to master so it can send the y_test(actual values) file
         multicast_node_socket.sendto('done'.encode(), (MULTICAST_GROUP, 10000))
-    elif n == 3:
+    # elif n == 3:
         # let master know it has finished calculating accuracy
-        multicast_node_socket.sendto(
-            'accuracy'.encode(), (MULTICAST_GROUP, 10000))
+        # multicast_node_socket.sendto(
+            # 'accuracy'.encode(), (MULTICAST_GROUP, 10000))
 
 
 def training():
     """
     Training the linear regression model
     """
-
+    # Reading the training data from the master node
     df = pd.read_csv('train_data.csv')
-    # Import data from train_data.csv file into a DataFrame
-    # df = pd.DataFrame([x.split(',') for x in train_data.split('\n')[1:]],  #spliting columns by ',', rows by '\n'
-    # columns=[x for x in train_data.split('\n')[0].split(',')]) #using first
-    # row as column name
 
     # print("spliting data to X and y")
     x_train = df.iloc[:, :-1].astype(float)  # convert string to float
     y_train = df.iloc[:, -1].astype(float)
 
-    # print(X_train)
-    # print(y_train)
-    # Build a linear regression model with X_train, y_train
+    # Building a linear regression model with x_train, y_train
     REGRESSOR.fit(x_train, y_train)
     print('Node1: Training completed!')
 
@@ -123,20 +111,13 @@ def testing():
     # Predict the test set results y_pred (y_hat) from X_test
     y_pred = REGRESSOR.predict(x_test)
     print('Node1: Prediction completed!')
-
+    # Calculating the R2 score to measure the accuracy of the model
     accuracy = r2_score(y_test, y_pred)
     print(f"The r2 score for the model is {accuracy * 100}%")
 
-    # Convert the predicted values to a dataframe
-    y_pred_file = pd.DataFrame(y_pred)
-    # Save the predicted values to a csv file
-    y_pred_file.to_csv('y_pred.csv', index=False)
-
 
 if __name__ == '__main__':
+    # Listening to the train the model
     listen(1)
+    # Listening to test the model and calculate the accuracy
     listen(2)
-    # Storing the predicted values
-    y_pred_file = open('y_pred.csv', 'r')
-    # Calculating the accuracy of the model
-    # listen(3)

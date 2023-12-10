@@ -1,12 +1,9 @@
 """Support Vector Regression model"""
 import socket
 import struct
-import sys
-
+# import sys
 import numpy as np
 import pandas as pd
-# Libraries for accuracy measurement
-from sklearn import metrics
 from sklearn.metrics import r2_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
@@ -52,10 +49,8 @@ def listen(n):  # n == 1: for training 2: for testing
 
         # Decoding the bytes to translate it to a string and the send time
         decoded_data = data.decode()
-        # print(decoded_data)
 
         # Creating a new file at server end and writing the data
-
         if data:
             if decoded_data == 'File sent!':
                 break
@@ -69,7 +64,7 @@ def listen(n):  # n == 1: for training 2: for testing
         count += 1
 
     print('Received successfully from node 2!')
-    # fo.close()
+
     if n == 1:
         training()
         # let master know it has finished training
@@ -88,12 +83,8 @@ def training():
     """
     Training the Support Vector Regression model
     """
-
+    # Reading the training data from the master node
     df = pd.read_csv('train_data.csv')
-    # Import data from train_data.csv file into a DataFrame
-    # df = pd.DataFrame([x.split(',') for x in train_data.split('\n')[1:]],  #spliting columns by ',', rows by '\n'
-    # columns=[x for x in train_data.split('\n')[0].split(',')]) #using first
-    # row as column name
 
     # print("spliting data to X and y")
     x_train = df.iloc[:, :-1].astype(float)  # convert string to float
@@ -131,6 +122,7 @@ def testing():
     y_pred = REGRESSOR.predict(x_test)
     print('Node2: Prediction completed!')
 
+    # Calculating the R2 score to measure the accuracy of the model
     accuracy = r2_score(y_test, y_pred)
     print(f"The r2 score for the model is {accuracy * 100}%")
 
@@ -141,9 +133,7 @@ def testing():
 
 
 if __name__ == '__main__':
+    # Listening to the train the model
     listen(1)
+    # Listening to test the model and calculate the accuracy
     listen(2)
-    # Storing the predicted values
-    y_pred_file = open('y_pred.csv', 'r')
-    # Calculating the accuracy of the model
-    # accuracy_measurement(y_pred_file)
