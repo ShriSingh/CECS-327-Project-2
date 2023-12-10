@@ -150,7 +150,7 @@ def receiver():
     predcount = 0
 
     # Listening to the multicast group
-    while predcount < NODES_COUNT:
+    while ackcount < NODES_COUNT:
         print('\nWaiting to receive message...', file=sys.stderr)
         # Handle multicast data received on multicast_socket
         data, address = node_to_master_socket.recvfrom(1024)
