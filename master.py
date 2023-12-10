@@ -1,13 +1,14 @@
 # Libraries for doing multicasting
-from operator import le
 import socket as soc
 import struct
 import sys
 import time
 # Libraries for data pre-processing
-import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
+# Libraries for accuracy measurement
+from sklearn import metrics
+from sklearn.metrics import accuracy_score
 
 
 # Storing the input file name
@@ -191,25 +192,14 @@ def accuracy_measurement(predictions):
 
     # Converting the string of predicted values into a dataframe
     predicted_prices = pd.DataFrame(predictions.split(','), columns=['price_predictions'])
-    # Checking if the dataframes are correctly made
+    # Collecting the predicted values from the dataframe into a csv file
     predicted_prices.to_csv('predicted_prices.csv', index=False)
 
-    # Storing the number of correct predictions
-    correct_predictions = 0
-    # Storing the number of incorrect predictions
-    incorrect_predictions = 0
-    # Calculating the number of correct predictions
-    for i in range(len(actual_prices)):
-        if actual_prices.iloc[i, 0] == predicted_prices.iloc[i, 0]:
-            correct_predictions += 1
-        else:
-            incorrect_predictions += 1
-
-    total_predictions = correct_predictions + incorrect_predictions
     # Calculating the percentage of correct predictions
-    percentage = correct_predictions / total_predictions
-    # Printing the percentage of correct predictions for each node
-    print(f'{percentage * 100}% Prediction Accuracy')
+    accuracy = accuracy_score(actual_prices, predicted_prices)
+
+    # Printing the accuracy
+    print(f"The accuracy of the model is {accuracy * 100}%")
 
 
 # Writing the main function
