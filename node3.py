@@ -2,11 +2,9 @@
 import socket
 import struct
 import sys
-
 import numpy as np
 import pandas as pd
 # Libraries for accuracy measurement
-from sklearn import metrics
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 from sklearn.preprocessing import PolynomialFeatures
@@ -80,10 +78,11 @@ def listen(n):  # n == 1: for training
     elif n == 2:
         testing()
         # send 'done' to master so it can send the y_test(actual values) file
-        multicast_node_socket.sendto('done'.encode(),(MULTICAST_GROUP, 10000))
+        multicast_node_socket.sendto('done'.encode(), (MULTICAST_GROUP, 10000))
     elif n == 3:
         # let master know it has finished calculating accuracy
-        multicast_node_socket.sendto('accuracy'.encode(), (MULTICAST_GROUP, 10000))
+        multicast_node_socket.sendto(
+            'accuracy'.encode(), (MULTICAST_GROUP, 10000))
 
 
 def training():

@@ -67,7 +67,7 @@ def data_pre_processing(file):
 
     # Merging the x_test and y_test datasets into one 'test' file
     test_data = pd.concat([x_test, y_test], axis=1)
-    test_data.to_csv('test.csv',index=False)
+    test_data.to_csv('test.csv', index=False)
 
     # # Keeping the x_test and y_test datasets separate
     # x_test.to_csv('x_test.csv', index=False)
@@ -88,7 +88,7 @@ def send_file_multicast(option: int):
         payload_file = open('train.csv', 'rb')
     elif option == 2:
         # payload_file = open('x_test.csv', 'rb')
-        payload_file = open('test.csv', 'rb')    
+        payload_file = open('test.csv', 'rb')
     # elif option == 3:
         # payload_file = open('y_test.csv', 'rb')
 
@@ -158,17 +158,13 @@ def receiver():
         # Decoding the bytes to translate it to a string and the send time
         decoded_data = data.decode()
 
-        # # Break the while loop when socket receive data
-        # if data:
-        #     break
-
         # Indicating the data has been received
         print('Received successfully from node!', file=sys.stderr)
 
         # Checking the prompt
         if decoded_data == 'ack':
             ackcount += 1
-            print(f'{ackcount} nodes training completed successfully!') 
+            print(f'{ackcount} nodes training completed successfully!')
             if ackcount >= NODES_COUNT:
                 time.sleep(0.1)
                 send_file_multicast(2)
@@ -179,8 +175,7 @@ def receiver():
         #         time.sleep(0.1)
         #         # Sending the y_test dataset to the multicast group to check for accuracy
         #         send_file_multicast(3)
-        elif decoded_data == 'accuracy':
-            sys.exit(0)
+
 
 # Writing the main function
 if __name__ == '__main__':

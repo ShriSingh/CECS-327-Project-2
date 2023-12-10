@@ -77,10 +77,11 @@ def listen(n):  # n == 1: for training 2: for testing
     elif n == 2:
         testing()
         # send 'done' to master so it can send the y_test(actual values) file
-        multicast_node_socket.sendto('done'.encode(),(MULTICAST_GROUP, 10000))
+        multicast_node_socket.sendto('done'.encode(), (MULTICAST_GROUP, 10000))
     elif n == 3:
         # let master know it has finished calculating accuracy
-        multicast_node_socket.sendto('accuracy'.encode(), (MULTICAST_GROUP, 10000))
+        multicast_node_socket.sendto(
+            'accuracy'.encode(), (MULTICAST_GROUP, 10000))
 
 
 def training():
@@ -98,13 +99,13 @@ def training():
     x_train = df.iloc[:, :-1].astype(float)  # convert string to float
     y_train = df.iloc[:, -1].astype(float)
 
-    # Feature Scaling
+    # Feature Scaling to remove mean and scale to unit variance
     sc_X = StandardScaler()
-    sc_y = StandardScaler()
+    sc_Y = StandardScaler()
 
     x_train = sc_X.fit_transform(x_train)
     y_train = np.array(y_train).reshape(-1, 1)
-    y_train = sc_y.fit_transform(y_train)
+    y_train = sc_Y.fit_transform(y_train)
 
     # Fit the SVM model according to the given training data.
     REGRESSOR.fit(x_train, y_train)
@@ -128,7 +129,7 @@ def testing():
 
     # Predict the test set results y_pred (y_hat) from X_test
     y_pred = REGRESSOR.predict(x_test)
-    print('Node1: Prediction completed!')
+    print('Node2: Prediction completed!')
 
     accuracy = r2_score(y_test, y_pred)
     print(f"The r2 score for the model is {accuracy * 100}%")
