@@ -105,7 +105,7 @@ def training():
 def testing():
     # Import data from train_data.csv file into a DataFrame
     df = pd.read_csv('test_data.csv')
-    x_test = df.iloc[:,:-1].astype(float)
+    x_test = df.iloc[:,:].astype(float)
 
     # Predict the test set results y_pred (y_hat) from X_test
     y_pred = REGRESSOR.predict(POLY.transform(x_test))
