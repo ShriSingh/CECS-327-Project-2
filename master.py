@@ -161,10 +161,7 @@ def receiver():
         print('Received successfully from node!', file=sys.stderr)
 
         # Checking the prompt
-        if decoded_data == 'train':
-            # Sending the training dataset to the multicast group
-            send_file_multicast(1)
-        elif decoded_data == 'test':
+        if decoded_data == 'ack':
             # Sending the x_test dataset to the multicast group
             send_file_multicast(2)
         elif decoded_data == 'done':
