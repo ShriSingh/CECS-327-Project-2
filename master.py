@@ -167,7 +167,7 @@ def receiver():
         elif decoded_data == 'test':
             # Sending the x_test dataset to the multicast group
             send_file_multicast(2)
-        elif decoded_data == 'ack':
+        elif decoded_data == 'done':
             ackcount += 1
             print(f'{ackcount} node(s) completed training successfully!')
             if ackcount >= NODES_COUNT:
@@ -184,4 +184,4 @@ if __name__ == '__main__':
     # Activating the receiver to listen to the multicast group
     receiver()
     # Closes out the program
-    sys.exit(0)
+    # sys.exit(0)

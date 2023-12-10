@@ -77,7 +77,7 @@ def listen(n):  # n == 1: for training
         # let master know it has finished training
         multicast_node_socket.sendto('ack'.encode(), (MULTICAST_GROUP, 10000))
     else:
-        # y_pred = testing()
+        testing()
         # send 'done' to master so it can send the y_test(actual values) file
         multicast_node_socket.sendto('done'.encode(),(MULTICAST_GROUP, 10000))
 
@@ -110,6 +110,9 @@ def training():
 
 
 def testing():
+    """
+    Get the test data from the master node and predict the values
+    """
     # Import data from train_data.csv file into a DataFrame
     df = pd.read_csv('test_data.csv')
     x_test = df.iloc[:-1, :].astype(float)
@@ -119,7 +122,10 @@ def testing():
     print('Node3: Prediction completed!')
     # print(y_pred)
 
-    return y_pred
+    # Convert the predicted values to a dataframe
+    y_pred_file = pd.DataFrame(y_pred)
+    # Save the predicted values to a csv file
+    y_pred_file.to_csv('y_pred.csv', index=False)
 
 
 def accuracy_measurement(prediction):
@@ -144,6 +150,6 @@ if __name__ == '__main__':
     listen(1)
     listen(2)
     # Storing the predicted values
-    y_pred_file = testing()
+    y_pred_file = open('test_data.csv', 'r')
     # Calculating the accuracy of the model
     accuracy_measurement(y_pred_file)

@@ -72,8 +72,8 @@ def listen(n):  # n == 1: for training 2: for testing
         training()
         # let master know it has finished training
         multicast_node_socket.sendto('ack'.encode(), (MULTICAST_GROUP, 10000))
-    else:
-        # y_pred = testing()
+    elif n == 2:
+        testing()
         # send 'done' to master so it can send the y_test(actual values) file
         multicast_node_socket.sendto('done'.encode(),(MULTICAST_GROUP, 10000))
 
@@ -81,7 +81,6 @@ def listen(n):  # n == 1: for training 2: for testing
 def training():
     """
     Training the linear regression model
-    :param train_data: the training data
     """
 
     df = pd.read_csv('train_data.csv')
@@ -102,6 +101,9 @@ def training():
 
 
 def testing():
+    """
+    Get the test data from the master node and predict the values
+    """
     # Import data from train_data.csv file into a DataFrame
     df = pd.read_csv('test_data.csv')
     x_test = df.iloc[:-1, :].astype(float)
@@ -109,18 +111,19 @@ def testing():
     # Predict the test set results y_pred (y_hat) from X_test
     y_pred = REGRESSOR.predict(x_test)
     print('Node1: Prediction completed!')
-    # print(y_pred)
 
-    return y_pred
+    # Convert the predicted values to a dataframe
+    y_pred_file = pd.DataFrame(y_pred)
+    # Save the predicted values to a csv file
+    y_pred_file.to_csv('y_pred.csv', index=False)
 
 
 def accuracy_measurement(prediction):
     """
     Figures out how accurate the model is by calculating
     the percentage of correct predictions from the y-test(actual prices)
-    dataset. Converts the string of predicted values into a dataframe and
-    calculates the percentage of correct predictions.
-    :param result: The predicted values sent from the node
+    dataset.
+    :param predictions: The predicted values sent from the node
     """
     # Reading the file with actual price values
     actual_prices = pd.read_csv('y_test.csv')
@@ -136,6 +139,6 @@ if __name__ == '__main__':
     listen(1)
     listen(2)
     # Storing the predicted values
-    y_pred_file = testing()
+    y_pred_file = open('test_data.csv', 'r')
     # Calculating the accuracy of the model
     accuracy_measurement(y_pred_file)
