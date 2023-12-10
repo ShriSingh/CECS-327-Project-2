@@ -3,10 +3,10 @@ import socket as soc
 import struct
 import sys
 import time
+
 # Libraries for data pre-processing
 import pandas as pd
 from sklearn.model_selection import train_test_split
-
 
 # Storing the input file name
 INPUT_FILE = 'housing.csv'
@@ -65,9 +65,13 @@ def data_pre_processing(file):
     train_data = pd.concat([x_train, y_train], axis=1)
     train_data.to_csv('train.csv', index=False)
 
-    # Keeping the x_test and y_test datasets separate
-    x_test.to_csv('x_test.csv', index=False)
-    y_test.to_csv('y_test.csv', index=False)
+    # Merging the x_test and y_test datasets into one 'test' file
+    test_data = pd.concat([x_test, y_test], axis=1)
+    test_data.to_csv('test.csv',index=False)
+
+    # # Keeping the x_test and y_test datasets separate
+    # x_test.to_csv('x_test.csv', index=False)
+    # y_test.to_csv('y_test.csv', index=False)
 
 
 def send_file_multicast(option: int):
@@ -83,9 +87,10 @@ def send_file_multicast(option: int):
     if option == 1:
         payload_file = open('train.csv', 'rb')
     elif option == 2:
-        payload_file = open('x_test.csv', 'rb')
-    elif option == 3:
-        payload_file = open('y_test.csv', 'rb')
+        # payload_file = open('x_test.csv', 'rb')
+        payload_file = open('test.csv', 'rb')    
+    # elif option == 3:
+        # payload_file = open('y_test.csv', 'rb')
 
     # Opening the socket
     print('Opening socket...', file=sys.stderr)
@@ -162,15 +167,18 @@ def receiver():
 
         # Checking the prompt
         if decoded_data == 'ack':
-            # Sending the x_test dataset to the multicast group
-            send_file_multicast(2)
-        elif decoded_data == 'done':
             ackcount += 1
-            print(f'{ackcount} node(s) completed training successfully!')
-            if ackcount == NODES_COUNT:
+            print(f'{ackcount} nodes training completed successfully!') 
+            if ackcount >= NODES_COUNT:
                 time.sleep(0.1)
-                # Sending the y_test dataset to the multicast group to check for accuracy
-                send_file_multicast(3)
+                send_file_multicast(2)
+        # elif decoded_data == 'done':
+        #     done_count += 1
+        #     print(f'{ackcount} node(s) completed training successfully!')
+        #     if done_count >= NODES_COUNT:
+        #         time.sleep(0.1)
+        #         # Sending the y_test dataset to the multicast group to check for accuracy
+        #         send_file_multicast(3)
         elif decoded_data == 'accuracy':
             sys.exit(0)
 

@@ -1,14 +1,15 @@
 """Polynomial Regression Model"""
 import socket
-import numpy as np
-import pandas as pd
-from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import PolynomialFeatures
 import struct
 import sys
+
+import numpy as np
+import pandas as pd
 # Libraries for accuracy measurement
 from sklearn import metrics
-from sklearn.metrics import accuracy_score
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
+from sklearn.preprocessing import PolynomialFeatures
 
 # Defining the multicast group address and port
 MULTICAST_GROUP = '224.3.29.71'
@@ -106,7 +107,7 @@ def training():
     # transform the features using fit_transform method of poly
     x_poly = POLY.fit_transform(x_train, y_train)
 
-    # fit
+    # Fit the SVM model according to the given training data.
     REGRESSOR.fit(x_poly, y_train)
 
     print('Node3: Training completed!')
@@ -118,12 +119,19 @@ def testing():
     """
     # Import data from train_data.csv file into a DataFrame
     df = pd.read_csv('test_data.csv')
-    x_test = df.iloc[:-1, :].astype(float)
+    # Part of the file to predict the values
+    x_test = df.iloc[:-1, :-1].astype(float)
+    # Part of the file to test the predicted values
+    y_test = df.iloc[:-1, -1].astype(float)
+    # Save the actual values to a csv file
+    y_test.to_csv('y_test.csv', index=False)
 
     # Predict the test set results y_pred (y_hat) from X_test
     y_pred = REGRESSOR.predict(POLY.transform(x_test))
     print('Node3: Prediction completed!')
-    # print(y_pred)
+
+    accuracy = r2_score(y_test, y_pred)
+    print(f"The r2 score for the model is {accuracy * 100}%")
 
     # Convert the predicted values to a dataframe
     y_pred_file = pd.DataFrame(y_pred)
@@ -153,6 +161,6 @@ if __name__ == '__main__':
     listen(1)
     listen(2)
     # Storing the predicted values
-    y_pred_file = open('test_data.csv', 'r')
+    y_pred_file = open('y_pred.csv', 'r')
     # Calculating the accuracy of the model
-    accuracy_measurement(y_pred_file)
+    # accuracy_measurement(y_pred_file)

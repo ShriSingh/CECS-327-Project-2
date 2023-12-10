@@ -1,13 +1,14 @@
 """Linear Regression Model"""
 import socket
-import numpy as np
-import pandas as pd
-from sklearn.linear_model import LinearRegression
 import struct
 import sys
+
+import numpy as np
+import pandas as pd
 # Libraries for accuracy measurement
 from sklearn import metrics
-from sklearn.metrics import accuracy_score
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 
 # Defining the multicast group address and port
 MULTICAST_GROUP = '224.3.29.71'
@@ -105,15 +106,25 @@ def training():
 
 def testing():
     """
-    Get the test data from the master node and predict the values
+    Getting the test data from the master node and predict the values
+    and then calculate the accuracy of the model by calculating the
+    r2 score.
     """
     # Import data from train_data.csv file into a DataFrame
     df = pd.read_csv('test_data.csv')
-    x_test = df.iloc[:-1, :].astype(float)
+    # Part of the file to predict the values
+    x_test = df.iloc[:-1, :-1].astype(float)
+    # Part of the file to test the predicted values
+    y_test = df.iloc[:-1, -1].astype(float)
+    # Save the actual values to a csv file
+    y_test.to_csv('y_test.csv', index=False)
 
     # Predict the test set results y_pred (y_hat) from X_test
     y_pred = REGRESSOR.predict(x_test)
     print('Node1: Prediction completed!')
+
+    accuracy = r2_score(y_test, y_pred)
+    print(f"The r2 score for the model is {accuracy * 100}%")
 
     # Convert the predicted values to a dataframe
     y_pred_file = pd.DataFrame(y_pred)
@@ -121,28 +132,10 @@ def testing():
     y_pred_file.to_csv('y_pred.csv', index=False)
 
 
-def accuracy_measurement(prediction):
-    """
-    Figures out how accurate the model is by calculating
-    the percentage of correct predictions from the y-test(actual prices)
-    dataset.
-    :param predictions: The predicted values sent from the node
-    """
-    # Reading the file with actual price values
-    actual_prices = pd.read_csv('y_test.csv')
-
-    # Calculating the percentage of correct predictions
-    accuracy = accuracy_score(actual_prices, prediction)
-
-    # Printing the accuracy
-    print(f"The accuracy of the model is {accuracy * 100}%")
-
-
 if __name__ == '__main__':
     listen(1)
     listen(2)
     # Storing the predicted values
-    y_pred_file = open('test_data.csv', 'r')
+    y_pred_file = open('y_pred.csv', 'r')
     # Calculating the accuracy of the model
-    accuracy_measurement(y_pred_file)
-    listen(3)
+    # listen(3)
