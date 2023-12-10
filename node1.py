@@ -123,7 +123,7 @@ def accuracy_measurement(prediction):
     actual_prices = pd.read_csv('y_test.csv')
    
     # Calculating the percentage of correct predictions
-    accuracy = accuracy_score(prediction, actual_prices)
+    accuracy = accuracy_score(actual_prices, prediction)
 
     # Printing the accuracy
     print(f"The accuracy of the model is {accuracy * 100}%")
