@@ -16,7 +16,7 @@ REGRESSOR = LinearRegression()
 
 
 # Reference: https://pymotw.com/2/socket/multicast.html
-def listen(n): #n == 1: for training 2: for testing
+def listen(n):  # n == 1: for training 2: for testing
     """
     A function to receive and acknowledge a message from a multicast group
     :param n: An integer to indicate the state for the node to either train or test
@@ -32,101 +32,105 @@ def listen(n): #n == 1: for training 2: for testing
     # on all interfaces.
     group = socket.inet_aton(MULTICAST_GROUP)
     mreq = struct.pack('4sL', group, socket.INADDR_ANY)
-    multicast_node_socket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+    multicast_node_socket.setsockopt(
+        socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
-    #determine which file to save
+    # determine which file to save
     if n == 1:
         filename = 'train_data.csv'
     else:
         filename = 'test_data.csv'
-    fo = open(filename, "w") 
+    fo = open(filename, "w")
 
-    count = 0 # counting how many times do we need to send all data
+    count = 0  # counting how many times do we need to send all data
     while True:
         print(f'{count}: Waiting to receive message...')
         # Handle multicast data received on multicast_socket
         data, address = multicast_node_socket.recvfrom(10248)
-        
+
         # Decoding the bytes to translate it to a string and the send time
         decoded_data = data.decode()
         # print(decoded_data)
 
-        # Creating a new file at server end and writing the data 
-    
-        
-        if data: 
+        # Creating a new file at server end and writing the data
+
+        if data:
             if decoded_data == 'File sent!':
                 break
             elif decoded_data == 'ack':
                 continue
-            else: 
-                fo.write(decoded_data) 
+            else:
+                fo.write(decoded_data)
         else:
             print("uhhh thats not suppposed to happen")
             break
         count += 1
 
-    print('Received successfully from node 1!') 
+    print('Received successfully from node 1!')
     # fo.close()
     if n == 1:
         training()
         # let master know it has finished training
-        multicast_node_socket.sendto('ack'.encode(),(MULTICAST_GROUP, 10000))
+        multicast_node_socket.sendto('ack'.encode(), (MULTICAST_GROUP, 10000))
     # else:
         # y_pred = testing()
         # send the predicted result to master
         # multicast_node_socket.sendto(str(y_pred).encode(),(MULTICAST_GROUP, 10000))
+
 
 def training():
     """
     Training the linear regression model
     :param train_data: the training data
     """
-    
+
     df = pd.read_csv('train_data.csv')
     # Import data from train_data.csv file into a DataFrame
     # df = pd.DataFrame([x.split(',') for x in train_data.split('\n')[1:]],  #spliting columns by ',', rows by '\n'
-    #                        columns=[x for x in train_data.split('\n')[0].split(',')]) #using first row as column name
+    # columns=[x for x in train_data.split('\n')[0].split(',')]) #using first
+    # row as column name
 
     # print("spliting data to X and y")
-    x_train = df.iloc[:,:-1].astype(float) #convert string to float
-    y_train = df.iloc[:,-1].astype(float)
+    x_train = df.iloc[:, :-1].astype(float)  # convert string to float
+    y_train = df.iloc[:, -1].astype(float)
 
     # print(X_train)
     # print(y_train)
     # Build a linear regression model with X_train, y_train
-    REGRESSOR.fit(x_train ,y_train) 
-    print('Node1: Training completed!') 
-    
+    REGRESSOR.fit(x_train, y_train)
+    print('Node1: Training completed!')
+
 
 def testing():
     # Import data from train_data.csv file into a DataFrame
     df = pd.read_csv('test_data.csv')
-    x_test = df.iloc[:-1,:].astype(float)
+    x_test = df.iloc[:-1, :].astype(float)
 
     # Predict the test set results y_pred (y_hat) from X_test
     y_pred = REGRESSOR.predict(x_test)
-    print('Node1: Prediction completed!') 
+    print('Node1: Prediction completed!')
     # print(y_pred)
 
     return y_pred
 
+
 def accuracy_measurement(prediction):
     """
-    Figures out how accurate the model is by calculating 
-    the percentage of correct predictions from the y-test(actual prices) 
+    Figures out how accurate the model is by calculating
+    the percentage of correct predictions from the y-test(actual prices)
     dataset. Converts the string of predicted values into a dataframe and
     calculates the percentage of correct predictions.
     :param result: The predicted values sent from the node
     """
     # Reading the file with actual price values
     actual_prices = pd.read_csv('y_test.csv')
-   
+
     # Calculating the percentage of correct predictions
     accuracy = accuracy_score(actual_prices, prediction)
 
     # Printing the accuracy
     print(f"The accuracy of the model is {accuracy * 100}%")
+
 
 if __name__ == '__main__':
     listen(1)
