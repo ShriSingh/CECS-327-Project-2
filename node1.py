@@ -121,18 +121,16 @@ def accuracy_measurement(prediction):
     """
     # Reading the file with actual price values
     actual_prices = pd.read_csv('y_test.csv')
-
-    # Reading the file with predicted price values in a csv file
-    with open('predicted_prices.csv', 'w') as file:
-        for value in str(prediction).split(','):
-            file.write(value)
-    
+   
     # Calculating the percentage of correct predictions
-    accuracy = accuracy_score(actual_prices, predicted_prices)
+    accuracy = accuracy_score(prediction, actual_prices)
 
     # Printing the accuracy
     print(f"The accuracy of the model is {accuracy * 100}%")
 
 if __name__ == '__main__':
     listen(1)
-    accuracy_measurement()
+    # Storing the predicted values
+    y_pred_file = testing()
+    # Calculating the accuracy of the model
+    accuracy_measurement(y_pred_file)

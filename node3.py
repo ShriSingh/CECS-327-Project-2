@@ -18,7 +18,7 @@ REGRESSOR = LinearRegression()
 POLY = PolynomialFeatures(degree=4)
 
 # Reference: https://pymotw.com/2/socket/multicast.html
-def listen(n): #n == 1: for training 2: for testing
+def listen(n): #n == 1: for training
     """
     A function to receive and acknowledge a message from a multicast group
     :param n: An integer to indicate the state for the node to either train or test
@@ -74,10 +74,10 @@ def listen(n): #n == 1: for training 2: for testing
         training()
         # let master know it has finished training 
         multicast_node_socket.sendto('ack'.encode(),(MULTICAST_GROUP, 10000))
-    else:
-        y_pred = testing()
+    # else:
+        # y_pred = testing()
         # send the predicted result to master
-        multicast_node_socket.sendto(str(y_pred).encode(),(MULTICAST_GROUP, 10000))
+        # multicast_node_socket.sendto(str(y_pred).encode(),(MULTICAST_GROUP, 10000))
 
 def training():
     """
@@ -127,18 +127,16 @@ def accuracy_measurement(prediction):
     """
     # Reading the file with actual price values
     actual_prices = pd.read_csv('y_test.csv')
-
-    # Reading the file with predicted price values in a csv file
-    with open('predicted_prices.csv', 'w') as file:
-        for value in str(prediction).split(','):
-            file.write(value)
-    
+   
     # Calculating the percentage of correct predictions
-    accuracy = accuracy_score(actual_prices, predicted_prices)
+    accuracy = accuracy_score(prediction, actual_prices)
 
     # Printing the accuracy
     print(f"The accuracy of the model is {accuracy * 100}%")
 
 if __name__ == '__main__':
     listen(1)
-    listen(2)
+    # Storing the predicted values
+    y_pred_file = testing()
+    # Calculating the accuracy of the model
+    accuracy_measurement(y_pred_file)
