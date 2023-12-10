@@ -167,10 +167,12 @@ def receiver():
         elif decoded_data == 'done':
             ackcount += 1
             print(f'{ackcount} node(s) completed training successfully!')
-            if ackcount >= NODES_COUNT:
+            if ackcount == NODES_COUNT:
                 time.sleep(0.1)
                 # Sending the y_test dataset to the multicast group to check for accuracy
                 send_file_multicast(3)
+        elif decoded_data == 'accuracy':
+            sys.exit(0)
 
 # Writing the main function
 if __name__ == '__main__':
@@ -180,5 +182,3 @@ if __name__ == '__main__':
     send_file_multicast(1)
     # Activating the receiver to listen to the multicast group
     receiver()
-    # Closes out the program
-    # sys.exit(0)

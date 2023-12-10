@@ -76,6 +76,9 @@ def listen(n):  # n == 1: for training 2: for testing
         testing()
         # send 'done' to master so it can send the y_test(actual values) file
         multicast_node_socket.sendto('done'.encode(),(MULTICAST_GROUP, 10000))
+    elif n == 3:
+        # let master know it has finished calculating accuracy
+        multicast_node_socket.sendto('accuracy'.encode(), (MULTICAST_GROUP, 10000))
 
 
 def training():
@@ -142,3 +145,4 @@ if __name__ == '__main__':
     y_pred_file = open('test_data.csv', 'r')
     # Calculating the accuracy of the model
     accuracy_measurement(y_pred_file)
+    listen(3)

@@ -76,10 +76,13 @@ def listen(n):  # n == 1: for training
         training()
         # let master know it has finished training
         multicast_node_socket.sendto('ack'.encode(), (MULTICAST_GROUP, 10000))
-    else:
+    elif n == 2:
         testing()
         # send 'done' to master so it can send the y_test(actual values) file
         multicast_node_socket.sendto('done'.encode(),(MULTICAST_GROUP, 10000))
+    elif n == 3:
+        # let master know it has finished calculating accuracy
+        multicast_node_socket.sendto('accuracy'.encode(), (MULTICAST_GROUP, 10000))
 
 
 def training():
