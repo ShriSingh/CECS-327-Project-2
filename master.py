@@ -84,6 +84,8 @@ def send_file_multicast(option: int):
         payload_file = open('train.csv', 'rb')
     elif option == 2:
         payload_file = open('x_test.csv', 'rb')
+    elif option == 3:
+        payload_file = open('y_test.csv', 'rb')
 
     # Opening the socket
     print('Opening socket...', file=sys.stderr)
@@ -163,19 +165,15 @@ def receiver():
             # Sending the training dataset to the multicast group
             send_file_multicast(1)
         elif decoded_data == 'test':
-            # Sending the testing dataset to the multicast group
+            # Sending the x_test dataset to the multicast group
             send_file_multicast(2)
         elif decoded_data == 'ack':
             ackcount += 1
             print(f'{ackcount} node(s) completed training successfully!')
             if ackcount >= NODES_COUNT:
                 time.sleep(0.1)
-                send_file_multicast(2)
-        '''
-        else:
-            predcount += 1
-            accuracy_measurement(decoded_data)
-        '''
+                # Sending the y_test dataset to the multicast group to check for accuracy
+                send_file_multicast(3)
 
 # Writing the main function
 if __name__ == '__main__':
