@@ -178,17 +178,38 @@ def receiver():
             accuracy_measurement(decoded_data)
 
 
-def accuracy_measurement(result):
+def accuracy_measurement(predictions):
     """
-    Figures out how accurate the model is by comparing
-    the predicted values sent with the actual values
-    (contained in the y_test values).
+    Figures out how accurate the model is by calculating 
+    the percentage of correct predictions from the y-test(actual prices) 
+    dataset. Converts the string of predicted values into a dataframe and
+    calculates the percentage of correct predictions.
     :param result: The predicted values sent from the node
     """
     # Reading the file with actual price values
     actual_prices = pd.read_csv('y_test.csv')
-    # Reading the file with predicted price values
-    predicted_prices = pd.read_csv(result)
+
+    # Converting the string of predicted values into a dataframe
+    predicted_prices = pd.DataFrame(predictions.split(','), columns=['price_predictions'])
+    # Checking if the dataframes are correctly made
+    predicted_prices.to_csv('predicted_prices.csv', index=False)
+
+    # Storing the number of correct predictions
+    correct_predictions = 0
+    # Storing the number of incorrect predictions
+    incorrect_predictions = 0
+    # Calculating the number of correct predictions
+    for i in range(len(actual_prices)):
+        if actual_prices.iloc[i, 0] == predicted_prices.iloc[i, 0]:
+            correct_predictions += 1
+        else:
+            incorrect_predictions += 1
+
+    total_predictions = correct_predictions + incorrect_predictions
+    # Calculating the percentage of correct predictions
+    percentage = correct_predictions / total_predictions
+    # Printing the percentage of correct predictions for each node
+    print(f'{percentage * 100}% Prediction Accuracy')
 
 
 # Writing the main function
