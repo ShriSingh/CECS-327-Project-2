@@ -24,11 +24,9 @@ def data_pre_processing(file):
     """
     # Reading the csv file
     data_read = pd.read_csv(file)
-    # print(len(data_read))
 
     # Dropping the rows that are null
     modified_data = data_read.dropna()
-    # print(len(modified_data))
 
     # Changing the values in the 'ocean_proximity' column to integers
     # Uses the conversion: ISLAND = 1, NEAR OCEAN = 2, NEAR BAY = 3, <1H OCEAN
@@ -68,10 +66,6 @@ def data_pre_processing(file):
     # Merging the x_test and y_test datasets into one 'test' file
     test_data = pd.concat([x_test, y_test], axis=1)
     test_data.to_csv('test.csv', index=False)
-
-    # # Keeping the x_test and y_test datasets separate
-    # x_test.to_csv('x_test.csv', index=False)
-    # y_test.to_csv('y_test.csv', index=False)
 
 
 def send_file_multicast(option: int):
@@ -147,7 +141,7 @@ def receiver():
     # Initilizing the count of nodes that have completed model training
     ackcount = 0
     # Initilizing the count of nodes that have completed model predicting
-    predcount = 0
+    # predcount = 0
 
     # Listening to the multicast group
     while ackcount < NODES_COUNT:
@@ -161,10 +155,10 @@ def receiver():
         # Indicating the data has been received
         print('Received successfully from node!', file=sys.stderr)
 
-        # Checking the prompt
+        # Checking the prompt from the nodes
         if decoded_data == 'ack':
             ackcount += 1
-            print(f'{ackcount} nodes training completed successfully!')
+            print(f'Node {ackcount} training completed successfully!')
             if ackcount >= NODES_COUNT:
                 time.sleep(0.1)
                 send_file_multicast(2)
