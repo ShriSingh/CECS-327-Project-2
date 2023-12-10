@@ -6,9 +6,6 @@ import time
 # Libraries for data pre-processing
 import pandas as pd
 from sklearn.model_selection import train_test_split
-# Libraries for accuracy measurement
-from sklearn import metrics
-from sklearn.metrics import accuracy_score
 
 
 # Storing the input file name
@@ -174,33 +171,11 @@ def receiver():
             if ackcount >= NODES_COUNT:
                 time.sleep(0.1)
                 send_file_multicast(2)
+        '''
         else:
             predcount += 1
             accuracy_measurement(decoded_data)
-
-
-def accuracy_measurement(prediction):
-    """
-    Figures out how accurate the model is by calculating 
-    the percentage of correct predictions from the y-test(actual prices) 
-    dataset. Converts the string of predicted values into a dataframe and
-    calculates the percentage of correct predictions.
-    :param result: The predicted values sent from the node
-    """
-    # Reading the file with actual price values
-    actual_prices = pd.read_csv('y_test.csv')
-
-    # Reading the file with predicted price values in a csv file
-    with open('predicted_prices.csv', 'w') as file:
-        for value in str(prediction).split(','):
-            file.write(value)
-    
-    # Calculating the percentage of correct predictions
-    accuracy = accuracy_score(actual_prices, predicted_prices)
-
-    # Printing the accuracy
-    print(f"The accuracy of the model is {accuracy * 100}%")
-
+        '''
 
 # Writing the main function
 if __name__ == '__main__':
