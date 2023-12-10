@@ -6,6 +6,9 @@ import struct
 import sys
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
+# Libraries for accuracy measurement
+from sklearn import metrics
+from sklearn.metrics import accuracy_score
 
 # Defining the multicast group address and port
 MULTICAST_GROUP = '224.3.29.71'
@@ -70,10 +73,10 @@ def listen(n): #n == 1: for training 2: for testing
         training()
         # let master know it has finished training
         multicast_node_socket.sendto('ack'.encode(),(MULTICAST_GROUP, 10000))
-    else:
-        y_pred = testing()
+    # else:
+        # y_pred = testing()
         # send the predicted result to master
-        multicast_node_socket.sendto(str(y_pred).encode(),(MULTICAST_GROUP, 10000))
+        # multicast_node_socket.sendto(str(y_pred).encode(),(MULTICAST_GROUP, 10000))
 
 def training():
     """
@@ -113,6 +116,28 @@ def testing():
     # print(y_pred)
 
     return y_pred
+
+def accuracy_measurement(prediction):
+    """
+    Figures out how accurate the model is by calculating 
+    the percentage of correct predictions from the y-test(actual prices) 
+    dataset. Converts the string of predicted values into a dataframe and
+    calculates the percentage of correct predictions.
+    :param result: The predicted values sent from the node
+    """
+    # Reading the file with actual price values
+    actual_prices = pd.read_csv('y_test.csv')
+
+    # Reading the file with predicted price values in a csv file
+    with open('predicted_prices.csv', 'w') as file:
+        for value in str(prediction).split(','):
+            file.write(value)
+    
+    # Calculating the percentage of correct predictions
+    accuracy = accuracy_score(actual_prices, predicted_prices)
+
+    # Printing the accuracy
+    print(f"The accuracy of the model is {accuracy * 100}%")
 
 if __name__ == '__main__':
     listen(1)
