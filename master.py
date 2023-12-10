@@ -179,7 +179,7 @@ def receiver():
             accuracy_measurement(decoded_data)
 
 
-def accuracy_measurement(predictions):
+def accuracy_measurement(prediction):
     """
     Figures out how accurate the model is by calculating 
     the percentage of correct predictions from the y-test(actual prices) 
@@ -190,11 +190,11 @@ def accuracy_measurement(predictions):
     # Reading the file with actual price values
     actual_prices = pd.read_csv('y_test.csv')
 
-    # Converting the string of predicted values into a dataframe
-    predicted_prices = pd.DataFrame(predictions.split(','), columns=['price_predictions'])
-    # Collecting the predicted values from the dataframe into a csv file
-    predicted_prices.to_csv('predicted_prices.csv', index=False)
-
+    # Reading the file with predicted price values in a csv file
+    with open('predicted_prices.csv', 'w') as file:
+        for value in str(prediction).split(','):
+            file.write(value)
+    
     # Calculating the percentage of correct predictions
     accuracy = accuracy_score(actual_prices, predicted_prices)
 
