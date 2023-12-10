@@ -99,7 +99,7 @@ def training():
     y_train = sc_y.fit_transform(y_train)
 
     REGRESSOR.fit(x_train,y_train)
-    print('Node2:Training completed!') 
+    print('Node2: Training completed!') 
     
 
 def testing():
@@ -109,7 +109,7 @@ def testing():
 
     # Predict the test set results y_pred (y_hat) from X_test
     y_pred = REGRESSOR.predict(x_test)
-    print('Node2:Prediction completed!') 
+    print('Node2: Prediction completed!') 
     # print(y_pred)
 
     return y_pred

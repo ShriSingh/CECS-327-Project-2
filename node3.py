@@ -99,7 +99,7 @@ def training():
     # fit
     REGRESSOR.fit(x_poly,y_train)
 
-    print('Node3:Training completed!') 
+    print('Node3: Training completed!') 
     
 
 def testing():
@@ -109,7 +109,7 @@ def testing():
 
     # Predict the test set results y_pred (y_hat) from X_test
     y_pred = REGRESSOR.predict(POLY.transform(x_test))
-    print('Node3:Prediction completed!') 
+    print('Node3: Prediction completed!') 
     # print(y_pred)
 
     return y_pred
