@@ -63,9 +63,9 @@ def listen(n): # n == 1: for training
             print("uhhh thats not suppposed to happen")
             break
         count += 1
-
     print('Received successfully from node 3!')
 
+    # Conducting the training or testing based on the input from the main
     if n == 1:
         training()
         # let master know it has finished training
@@ -74,10 +74,6 @@ def listen(n): # n == 1: for training
         testing()
         # send 'done' to master so it can send the y_test(actual values) file
         multicast_node_socket.sendto('done'.encode(), (MULTICAST_GROUP, 10000))
-    elif n == 3:
-        # let master know it has finished calculating accuracy
-        multicast_node_socket.sendto(
-            'accuracy'.encode(), (MULTICAST_GROUP, 10000))
 
 
 def training():

@@ -37,6 +37,7 @@ def listen(n):  # n == 1: for training 2: for testing
         filename = 'train_data.csv'
     else:
         filename = 'test_data.csv'
+    # Writing a new file based on the filename
     fo = open(filename, "w")
 
     count = 0  # counting how many times do we need to send all data
@@ -60,9 +61,9 @@ def listen(n):  # n == 1: for training 2: for testing
             print("uhhh thats not suppposed to happen")
             break
         count += 1
-
     print('Received successfully from node 1!')
-
+    
+    # Conducting the training or testing based on the input from the main
     if n == 1:
         training()
         # let master know it has finished training
@@ -71,10 +72,6 @@ def listen(n):  # n == 1: for training 2: for testing
         testing()
         # send 'done' to master so it can send the y_test(actual values) file
         multicast_node_socket.sendto('done'.encode(), (MULTICAST_GROUP, 10000))
-    # elif n == 3:
-        # let master know it has finished calculating accuracy
-        # multicast_node_socket.sendto(
-            # 'accuracy'.encode(), (MULTICAST_GROUP, 10000))
 
 
 def training():
